@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa 2 - Cadastro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .badge {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .reward {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px dashed #4CAF50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #45a049;
+        }
+        
+        .btn-help {
+            background: #ff9800;
+            margin-top: 10px;
+        }
+        
+        .btn-help:hover {
+            background: #f57c00;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .message {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .uuid-code {
+            font-family: monospace;
+            font-size: 14px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">💰 TAREFA 2 - Cadastro</div>
+        
+        <h1>Complete seu Cadastro</h1>
+        <p class="subtitle">Preencha o formulário abaixo para ganhar <strong>R$ 5,00</strong> extras!</p>
+        
+        <div class="reward">
+            <strong>🎁 RECOMPENSA: R$ 5,00</strong>
+            <p style="margin-top: 5px; font-size: 14px;">+ Seu saldo anterior: R$ 5,00</p>
+            <p style="margin-top: 5px; font-size: 14px; color: #4CAF50;"><strong>Total: R$ 10,00</strong></p>
+        </div>
+
+        <form id="cadastroForm">
+            <div class="form-group">
+                <label for="nome">Nome Completo *</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-mail *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone" placeholder="(11) 99999-9999">
+            </div>
+            
+            <div class="form-group">
+                <label for="chave_pix">Chave PIX *</label>
+                <input type="text" id="chave_pix" name="chave_pix" required placeholder="CPF, e-mail ou telefone">
+            </div>
+            
+            <div class="form-group">
+                <label for="pix_nome">Nome na Conta PIX *</label>
+                <input type="text" id="pix_nome" name="pix_nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="indicante">Código do Indicador </label>
+                <input type="text" id="indicante" name="indicante" placeholder="Cole aqui o código que recebeu">
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                ✅ Finaliza o cadastro pra ganhar mais R$ 5,00
+            </button>
+            
+            <a href="ajuda.html" class="btn btn-help">
+                ❓ Ajuda
+            </a>
+        </form>
+
+        <div id="message" class="message"></div>
+        
+        <div class="footer">
+            Obrigado por usar o App, continua ganhando ! 🚀
+            <a href="tarefa3.html" class="btn btn-help" style="margin-top: 10px;">
+                $ Proxima tarefa mais 5,00 
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // SUAS CREDENCIAIS DO SUPABASE
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            // Dados do formulário
+            const formData = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value || '(não informado)',
+                chave_pix: document.getElementById('chave_pix').value,
+                pix_nome: document.getElementById('pix_nome').value,
+                indicante: document.getElementById('indicante').value || '',
+                saldo: 5.00,
+                mensagem: 'Cadastro completo - Ganhou R$ 5,00!',
+                indicador_code: gerarUUID(),
+                premio: 0,
+                bonus: 0,
+                indicados_count: 0,
+                status_online: true,
+                last_active: new Date().toISOString(),
+                blogsite: "",
+                urlvideo: "",
+                urlsound: "",
+                urlnegocio: ""
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cadastrando...';
+
+            try {
+                // INSERT DIRETO NO SUPABASE
+                const response = await fetch(SUPABASE_URL + '/rest/v1/appviral', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify([formData])
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = `
+                        🎉 <strong>CADASTRO SUCESSO!</strong><br><br>
+                        ✅ <strong>R$ 5,00</strong> adicionados ao seu saldo!<br>
+                        💰 <strong>Saldo Total: R$ 10,00</strong><br><br>
+                        📋 <strong>Seu código de indicação:</strong><br>
+                        <div class="uuid-code">${formData.indicador_code}</div>
+                        <small>Use este código completo para indicar amigos!</small>
+                    `;
+                    messageDiv.style.display = 'block';
+                    
+                    document.getElementById('cadastroForm').reset();
+                    
+                    setTimeout(() => {
+                        window.location.href = 'tarefa3.html';
+                    }, 5000);
+                    
+                } else {
+                    const error = await response.json();
+                    throw new Error(JSON.stringify(error));
+                }
+
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ <strong>ERRO AO CADASTRAR:</strong><br>' + error.message;
+                messageDiv.style.display = 'block';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✅ Tentar Novamente - Ganhar R$ 5,00';
+            }
+        });
+
+        // FUNÇÃO PARA GERAR UUID COMPLETA
+        function gerarUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const indicanteCode = urlParams.get('ref');
+            if (indicanteCode) {
+                document.getElementById('indicante').value = indicanteCode;
+            }
+        });
+    </script>
+</body>
+</html>
