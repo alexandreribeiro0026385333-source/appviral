@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa 3 - Ver Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .badge {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            display: block;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .btn-email {
+            background: #2196F3;
+        }
+        
+        .btn-blog {
+            background: #FF9800;
+        }
+        
+        .user-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .next-task {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">💰 TAREFA 3 - Ver Blog</div>
+        
+        <h1>Assista ao Nosso Blog</h1>
+        <p class="subtitle">Complete a tarefa para continuar ganhando!</p>
+
+        <!-- BOTÃO 1 - EMAIL -->
+        <div class="form-group">
+            <label for="email">📧 Digite seu email</label>
+            <input type="email" id="email" name="email" placeholder="Seu email cadastrado">
+        </div>
+
+        <button class="btn btn-email" onclick="carregarDados()">
+            📊 Ver Meus Dados
+        </button>
+
+        <!-- DIV PRA MOSTRAR DADOS -->
+        <div id="userData" class="user-data" style="display: none;">
+            <p><strong>Nome:</strong> <span id="userNome"></span></p>
+            <p><strong>Email:</strong> <span id="userEmailShow"></span></p>
+            <p><strong>Saldo:</strong> R$ <span id="userSaldo"></span></p>
+            <p><strong>Seu Código:</strong> <span id="userCodigo"></span></p>
+        </div>
+
+        <!-- BOTÃO 2 - BLOG -->
+        <button class="btn btn-blog" onclick="abrirBlog()">
+            👀 Ver o Blog
+        </button>
+
+        <div id="message" class="message" style="display: none;"></div>
+        
+        <!-- LINK PRÓXIMA TAREFA -->
+        <div class="next-task">
+            <a href="tarefa5.html" style="background: #9C27B0; color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block;">
+                🚀 Próxima Tarefa + R$ 5,00
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function carregarDados() {
+            const email = document.getElementById('email').value;
+            const userDataDiv = document.getElementById('userData');
+            const messageDiv = document.getElementById('message');
+            
+            if (!email) {
+                alert('Digite seu email!');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('appviral')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    document.getElementById('userNome').textContent = data.nome;
+                    document.getElementById('userEmailShow').textContent = data.email;
+                    document.getElementById('userSaldo').textContent = data.saldo;
+                    document.getElementById('userCodigo').textContent = data.indicador_code;
+                    
+                    userDataDiv.style.display = 'block';
+                    
+                    const novoSaldo = parseFloat(data.saldo) + 5.00;
+                    
+                    await supabase
+                        .from('appviral')
+                        .update({ 
+                            saldo: novoSaldo,
+                            mensagem: 'Ganhou R$ 5,00 pela tarefa do blog!'
+                        })
+                        .eq('email', email);
+
+                    document.getElementById('userSaldo').textContent = novoSaldo;
+                    
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = `✅ +R$ 5,00 adicionados! Saldo atual: R$ ${novoSaldo}`;
+                    messageDiv.style.display = 'block';
+
+                } else {
+                    throw new Error('Email não encontrado');
+                }
+            } catch (error) {
+                alert('Email não encontrado!');
+            }
+        }
+
+        function abrirBlog() {
+            window.open('https://www.tumblr.com/blog/appdashboard34', '_blank');
+        }
+    </script>
+</body>
+</html>
