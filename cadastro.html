@@ -247,26 +247,28 @@
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
             
-            // Dados do formulário
+            // Dados do formulário - COM AVATAR NO FIM
             const formData = {
                 nome: document.getElementById('nome').value,
                 email: document.getElementById('email').value,
                 telefone: document.getElementById('telefone').value || '(não informado)',
                 chave_pix: document.getElementById('chave_pix').value,
                 pix_nome: document.getElementById('pix_nome').value,
-                indicante: document.getElementById('indicante').value || '',
-                saldo: 5.00,
-                mensagem: 'Cadastro completo - Ganhou R$ 5,00!',
-                indicador_code: gerarUUID(),
+                data_cadastro: new Date().toISOString(),
                 premio: 0,
                 bonus: 0,
+                saldo: 5.00,
+                mensagem: 'Cadastro completo - Ganhou R$ 5,00!',
+                indicante: document.getElementById('indicante').value || '',
+                indicador_code: gerarUUID(),
                 indicados_count: 0,
                 status_online: true,
                 last_active: new Date().toISOString(),
                 blogsite: "",
                 urlvideo: "",
                 urlsound: "",
-                urlnegocio: ""
+                urlnegocio: "",
+                avatar: document.getElementById('nome').value // AVATAR NO FIM - USA O NOME
             };
 
             submitBtn.disabled = true;
@@ -304,8 +306,6 @@
                     messageDiv.style.display = 'block';
                     
                     document.getElementById('cadastroForm').reset();
-                    
-                    // NÃO TEM REDIRECIONAMENTO AUTOMÁTICO - USUÁRIO FICA NA PÁGINA
                     
                 } else {
                     const error = await response.json();
