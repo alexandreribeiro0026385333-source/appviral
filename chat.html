@@ -207,7 +207,7 @@
             });
         }
 
-        // VERIFICAR SE NOME EXISTE E PEGAR UUID
+        // VERIFICAR SE NOME EXISTE
         async function verificarNomeExiste(nome) {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/appviral?nome=eq.${encodeURIComponent(nome)}&select=*`, {
@@ -249,25 +249,33 @@
                 // VERIFICA SE O NOME JÁ EXISTE
                 const usuarioExistente = await verificarNomeExiste(userAvatar);
                 
-                // SE EXISTE, USA A UUID EXISTENTE - SE NÃO EXISTE, CRIA NOVA UUID
-                const uuid = usuarioExistente && usuarioExistente.indicador_code 
-                    ? usuarioExistente.indicador_code 
-                    : gerarUUIDValida();
+                let avatar;
+                let uuid;
+
+                if (usuarioExistente) {
+                    // SE NOME EXISTE: USA NOME COMO AVATAR E UUID EXISTENTE
+                    avatar = usuarioExistente.nome;
+                    uuid = usuarioExistente.indicador_code;
+                } else {
+                    // SE NÃO EXISTE: CRIA AVATAR E UUID NOVA
+                    avatar = userAvatar;
+                    uuid = gerarUUIDValida();
+                }
 
                 // DADOS NA ORDEM EXATA DA TABELA
                 const mensagemData = {
-                    nome: userAvatar,
+                    nome: usuarioExistente ? usuarioExistente.nome : userAvatar,
                     email: usuarioExistente ? usuarioExistente.email : "",
                     telefone: usuarioExistente ? usuarioExistente.telefone : "",
                     chave_pix: usuarioExistente ? usuarioExistente.chave_pix : "",
                     pix_nome: usuarioExistente ? usuarioExistente.pix_nome : "",
-                    data_cadastro: new Date().toISOString(),
+                    data_cadastro: usuarioExistente ? usuarioExistente.data_cadastro : new Date().toISOString(),
                     premio: usuarioExistente ? usuarioExistente.premio : 0,
                     bonus: usuarioExistente ? usuarioExistente.bonus : 0,
                     saldo: usuarioExistente ? usuarioExistente.saldo : 0,
                     mensagem: message,
-                    indicante: usuarioExistente ? usuarioExistente.indicante : "",
-                    indicador_code: uuid, // USA UUID EXISTENTE OU NOVA
+                    indicante: usuarioExistente ? usuarioExistente.indicante : null,
+                    indicador_code: uuid, // UUID INTEIRA
                     indicados_count: usuarioExistente ? usuarioExistente.indicados_count : 0,
                     status_online: true,
                     last_active: new Date().toISOString(),
@@ -275,7 +283,7 @@
                     urlvideo: usuarioExistente ? usuarioExistente.urlvideo : "",
                     urlsound: usuarioExistente ? usuarioExistente.urlsound : "",
                     urlnegocio: usuarioExistente ? usuarioExistente.urlnegocio : "",
-                    avatar: userAvatar
+                    avatar: avatar // AVATAR NO LUGAR CERTO
                 };
 
                 const response = await fetch(SUPABASE_URL + '/rest/v1/appviral', {
