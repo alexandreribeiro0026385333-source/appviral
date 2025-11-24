@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Público</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .badge {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .chat-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e9ecef;
+        }
+        
+        .message {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2196F3;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: between;
+            margin-bottom: 5px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .message-time {
+            color: #666;
+            font-size: 12px;
+            margin-left: auto;
+        }
+        
+        .message-text {
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #2196F3;
+            outline: none;
+        }
+        
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #45a049;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        
+        .no-messages {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">💬 Chat Público</div>
+        
+        <h1>Chat em Tempo Real</h1>
+        <p class="subtitle">Converse com todos os usuários em tempo real!</p>
+
+        <!-- ÁREA DO CHAT -->
+        <div class="chat-container" id="chatMessages">
+            <div class="loading">📡 Carregando mensagens...</div>
+        </div>
+
+        <!-- FORMULÁRIO DE MENSAGEM -->
+        <form id="messageForm">
+            <div class="form-group">
+                <label for="userName">Seu Nome:</label>
+                <input type="text" id="userName" name="userName" required placeholder="Digite seu nome">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Mensagem:</label>
+                <textarea id="message" name="message" required placeholder="Digite sua mensagem..."></textarea>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                💬 Enviar Mensagem
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // SUAS CREDENCIAIS DO SUPABASE
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        // CARREGAR MENSAGENS
+        async function carregarMensagens() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/appviral?select=nome,mensagem,created_at&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const mensagens = await response.json();
+                    exibirMensagens(mensagens);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar mensagens:', error);
+            }
+        }
+
+        // EXIBIR MENSAGENS NA TELA
+        function exibirMensagens(mensagens) {
+            const chatContainer = document.getElementById('chatMessages');
+            
+            if (mensagens.length === 0) {
+                chatContainer.innerHTML = '<div class="no-messages">💬 Nenhuma mensagem ainda. Seja o primeiro a escrever!</div>';
+                return;
+            }
+
+            // Filtrar apenas mensagens que têm nome e mensagem
+            const mensagensValidas = mensagens.filter(msg => msg.nome && msg.mensagem);
+            
+            if (mensagensValidas.length === 0) {
+                chatContainer.innerHTML = '<div class="no-messages">💬 Nenhuma mensagem válida encontrada.</div>';
+                return;
+            }
+
+            chatContainer.innerHTML = mensagensValidas.map(msg => `
+                <div class="message">
+                    <div class="message-header">
+                        <span class="user-name">${msg.nome}</span>
+                        <span class="message-time">${formatarData(msg.created_at)}</span>
+                    </div>
+                    <div class="message-text">${msg.mensagem}</div>
+                </div>
+            `).join('');
+            
+            // Rolagem automática para a última mensagem
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // FORMATAR DATA
+        function formatarData(dataString) {
+            if (!dataString) return '';
+            const data = new Date(dataString);
+            return data.toLocaleString('pt-BR');
+        }
+
+        // ENVIAR MENSAGEM
+        document.getElementById('messageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const userName = document.getElementById('userName').value;
+            const message = document.getElementById('message').value;
+
+            if (!userName || !message) {
+                alert('Preencha nome e mensagem!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            try {
+                const mensagemData = {
+                    nome: userName,
+                    mensagem: message,
+                    created_at: new Date().toISOString()
+                };
+
+                const response = await fetch(SUPABASE_URL + '/rest/v1/appviral', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify([mensagemData])
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').value = '';
+                    carregarMensagens(); // Recarrega as mensagens
+                } else {
+                    throw new Error('Erro ao enviar mensagem');
+                }
+
+            } catch (error) {
+                alert('Erro ao enviar mensagem: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬 Enviar Mensagem';
+            }
+        });
+
+        // ATUALIZAÇÃO AUTOMÁTICA DO CHAT
+        setInterval(carregarMensagens, 3000); // Atualiza a cada 3 segundos
+
+        // CARREGAR MENSAGENS AO INICIAR
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarMensagens();
+        });
+    </script>
+</body>
+</html>
