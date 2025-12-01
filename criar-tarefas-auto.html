@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar Tarefas Automáticas</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #f5f5f5;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #0066cc;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .info-box {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #0066cc;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    .btn {
+        background: #0066cc;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+        margin-bottom: 10px;
+        transition: background 0.3s;
+    }
+
+    .btn:hover {
+        background: #0055aa;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    .btn-success {
+        background: #198754;
+    }
+
+    .btn-success:hover {
+        background: #157347;
+    }
+
+    .message {
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+        display: none;
+    }
+
+    .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .tasks-list {
+        margin-top: 30px;
+    }
+
+    .task-item {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 4px solid #4CAF50;
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .task-title {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .task-value {
+        background: #198754;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Criar Tarefas Automáticas</h1>
+        
+        <div class="info-box">
+            <strong>📋 Banco: Supabase</strong><br>
+            <strong>🔗 URL:</strong> https://dpzxdwzlcrerezmloidk.supabase.co<br>
+            <strong>🗂️ Tabela:</strong> tarefas
+        </div>
+
+        <!-- FORMULÁRIO PARA CRIAR TAREFA -->
+        <form id="criarTarefaForm">
+            <div class="form-group">
+                <label for="titulo">Título da Tarefa *</label>
+                <input type="text" id="titulo" required placeholder="Ex: Avaliar produto, Assistir vídeo, etc.">
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição Detalhada *</label>
+                <textarea id="descricao" required placeholder="Descreva passo a passo o que o usuário precisa fazer..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="valor">Valor da Recompensa (R$) *</label>
+                <input type="number" id="valor" step="0.01" min="0.10" value="0.10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo">Tipo de Tarefa</label>
+                <select id="tipo">
+                    <option value="cadastro">📝 Cadastro</option>
+                    <option value="anuncio">📺 Assistir Anúncio</option>
+                    <option value="avaliacao">⭐ Avaliar Produto</option>
+                    <option value="clique">🖱️ Click/Visita</option>
+                    <option value="pesquisa">📊 Pesquisa</option>
+                    <option value="download">📥 Download/Instalação</option>
+                    <option value="social">📱 Compartilhar</option>
+                    <option value="outro">🔧 Outro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="link_tarefa">Link da Tarefa (opcional)</label>
+                <input type="url" id="link_tarefa" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label for="tempo_minutos">Tempo Estimado (minutos)</label>
+                <input type="number" id="tempo_minutos" min="1" value="5" placeholder="5">
+            </div>
+
+            <div class="form-group">
+                <label for="quantidade">Quantidade de Tarefas</label>
+                <input type="number" id="quantidade" min="1" value="1" placeholder="Quantas tarefas criar?">
+            </div>
+
+            <button type="submit" class="btn btn-success" id="btnCriar">
+                🚀 Criar Tarefa(s)
+            </button>
+        </form>
+
+        <!-- BOTÕES PARA CRIAÇÃO AUTOMÁTICA -->
+        <div style="margin: 30px 0; border-top: 2px dashed #ddd; padding-top: 20px;">
+            <h3>⚡ Criação Automática</h3>
+            
+            <button class="btn" onclick="criarTarefasPadrao('cadastro')">
+                📝 Criar Tarefas de Cadastro (5x)
+            </button>
+            
+            <button class="btn" onclick="criarTarefasPadrao('anuncio')">
+                📺 Criar Tarefas de Anúncios (10x)
+            </button>
+            
+            <button class="btn" onclick="criarTarefasPadrao('avaliacao')">
+                ⭐ Criar Tarefas de Avaliação (8x)
+            </button>
+            
+            <button class="btn btn-danger" onclick="limparTodasTarefas()">
+                🗑️ Limpar Todas as Tarefas
+            </button>
+        </div>
+
+        <!-- MENSAGEM DE STATUS -->
+        <div id="message" class="message"></div>
+
+        <!-- LISTA DE TAREFAS EXISTENTES -->
+        <div class="tasks-list" id="tasksList">
+            <h3>📋 Tarefas Existentes no Banco</h3>
+            <div id="tarefasContainer">Carregando...</div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO SUPABASE
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        // CARREGAR TAREFAS EXISTENTES
+        async function carregarTarefas() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?order=id.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Erro ao carregar tarefas');
+                
+                const tarefas = await response.json();
+                mostrarTarefasExistentes(tarefas);
+                
+            } catch (erro) {
+                document.getElementById('tarefasContainer').innerHTML = 
+                    `<div class="error">Erro ao carregar: ${erro.message}</div>`;
+            }
+        }
+
+        // MOSTRAR TAREFAS EXISTENTES
+        function mostrarTarefasExistentes(tarefas) {
+            const container = document.getElementById('tarefasContainer');
+            
+            if (!tarefas || tarefas.length === 0) {
+                container.innerHTML = '<div class="task-item">Nenhuma tarefa encontrada no banco.</div>';
+                return;
+            }
+            
+            container.innerHTML = tarefas.map(tarefa => `
+                <div class="task-item">
+                    <div class="task-header">
+                        <span class="task-title">#${tarefa.id} - ${tarefa.titulo}</span>
+                        <span class="task-value">R$ ${parseFloat(tarefa.valor).toFixed(2)}</span>
+                    </div>
+                    <div style="color: #666; font-size: 14px; margin-bottom: 5px;">
+                        ${tarefa.descricao.substring(0, 100)}...
+                    </div>
+                    <div style="font-size: 12px; color: #888;">
+                        Tipo: ${tarefa.tipo || 'geral'} | Status: ${tarefa.status} | 
+                        Criada: ${new Date(tarefa.data_criacao).toLocaleDateString()}
+                        <button onclick="deletarTarefa(${tarefa.id})" style="float: right; background: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // CRIAR TAREFA ÚNICA
+        document.getElementById('criarTarefaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const titulo = document.getElementById('titulo').value;
+            const descricao = document.getElementById('descricao').value;
+            const valor = document.getElementById('valor').value;
+            const tipo = document.getElementById('tipo').value;
+            const link_tarefa = document.getElementById('link_tarefa').value;
+            const tempo_minutos = document.getElementById('tempo_minutos').value;
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+            
+            const btn = document.getElementById('btnCriar');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Criando...';
+            
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const tarefasParaCriar = [];
+                
+                // Criar múltiplas tarefas se quantidade > 1
+                for (let i = 1; i <= quantidade; i++) {
+                    const tarefaTitulo = quantidade > 1 ? `${titulo} #${i}` : titulo;
+                    
+                    tarefasParaCriar.push({
+                        titulo: tarefaTitulo,
+                        descricao: descricao,
+                        valor: parseFloat(valor),
+                        tipo: tipo,
+                        status: 'ativa',
+                        link_tarefa: link_tarefa || null,
+                        tempo_minutos: parseInt(tempo_minutos) || 5,
+                        data_criacao: new Date().toISOString()
+                    });
+                }
+                
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(tarefasParaCriar)
+                });
+                
+                if (response.ok) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = `
+                        ✅ <strong>${quantidade} TAREFA(S) CRIADA(S) COM SUCESSO!</strong><br>
+                        ${quantidade > 1 ? `Foram criadas ${quantidade} tarefas automaticamente.` : ''}
+                    `;
+                    messageDiv.style.display = 'block';
+                    
+                    // Limpar formulário
+                    if (quantidade === 1) {
+                        document.getElementById('criarTarefaForm').reset();
+                        document.getElementById('valor').value = '0.10';
+                        document.getElementById('tempo_minutos').value = '5';
+                        document.getElementById('quantidade').value = '1';
+                    }
+                    
+                    // Recarregar lista
+                    carregarTarefas();
+                    
+                } else {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+            } catch (erro) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = `❌ <strong>ERRO AO CRIAR TAREFA(S):</strong><br>${erro.message}`;
+                messageDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+
+        // CRIAR TAREFAS PADRÃO AUTOMATICAMENTE
+        async function criarTarefasPadrao(tipo) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'none';
+            
+            let tarefasPadrao = [];
+            let quantidade = 0;
+            
+            // DEFINIR TAREFAS POR TIPO
+            if (tipo === 'cadastro') {
+                quantidade = 5;
+                tarefasPadrao = [
+                    {
+                        titulo: "Complete seu Cadastro Básico",
+                        descricao: "Preencha todos os campos do formulário de cadastro com informações válidas.",
+                        valor: 0.50,
+                        tipo: "cadastro",
+                        tempo_minutos: 3
+                    },
+                    {
+                        titulo: "Atualize seu Perfil",
+                        descricao: "Adicione foto de perfil e complete informações pessoais.",
+                        valor: 0.30,
+                        tipo: "cadastro", 
+                        tempo_minutos: 2
+                    },
+                    {
+                        titulo: "Configure Chave PIX",
+                        descricao: "Cadastre uma chave PIX válida para receber seus pagamentos.",
+                        valor: 0.40,
+                        tipo: "cadastro",
+                        tempo_minutos: 2
+                    },
+                    {
+                        titulo: "Verifique seu E-mail",
+                        descricao: "Confirme seu endereço de e-mail clicando no link enviado.",
+                        valor: 0.25,
+                        tipo: "cadastro",
+                        tempo_minutos: 1
+                    },
+                    {
+                        titulo: "Convide 1 Amigo",
+                        descricao: "Use seu código de indicação para convidar um amigo.",
+                        valor: 1.00,
+                        tipo: "cadastro",
+                        tempo_minutos: 5
+                    }
+                ];
+            }
+            
+            else if (tipo === 'anuncio') {
+                quantidade = 10;
+                for (let i = 1; i <= 10; i++) {
+                    tarefasPadrao.push({
+                        titulo: `Assistir Anúncio #${i}`,
+                        descricao: `Assista o anúncio completo por 30 segundos sem pular. Clique no link, aguarde o timer e confirme.`,
+                        valor: 0.10 + (i * 0.02),
+                        tipo: "anuncio",
+                        link_tarefa: "https://exemplo.com/anuncio-" + i,
+                        tempo_minutos: 1
+                    });
+                }
+            }
+            
+            else if (tipo === 'avaliacao') {
+                quantidade = 8;
+                const produtos = ["Smartphone", "Notebook", "Fone Bluetooth", "Smartwatch", "Tablet", "Câmera", "Console", "TV"];
+                
+                produtos.forEach((produto, index) => {
+                    tarefasPadrao.push({
+                        titulo: `Avaliar ${produto}`,
+                        descricao: `Analise o produto ${produto} e dê uma nota de 0 a 9 baseado na sua experiência.`,
+                        valor: 0.15 + (index * 0.05),
+                        tipo: "avaliacao",
+                        link_tarefa: "https://exemplo.com/produto-" + (index + 1),
+                        tempo_minutos: 2
+                    });
+                });
+            }
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(tarefasPadrao)
+                });
+                
+                if (response.ok) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = `
+                        ✅ <strong>${quantidade} TAREFAS ${tipo.toUpperCase()} CRIADAS!</strong><br>
+                        Foram criadas ${quantidade} tarefas automaticamente no banco.
+                    `;
+                    messageDiv.style.display = 'block';
+                    
+                    carregarTarefas();
+                    
+                } else {
+                    throw new Error(`Erro ${response.status}`);
+                }
+                
+            } catch (erro) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = `❌ <strong>ERRO:</strong><br>${erro.message}`;
+                messageDiv.style.display = 'block';
+            }
+        }
+
+        // DELETAR TAREFA ESPECÍFICA
+        async function deletarTarefa(id) {
+            if (!confirm(`Tem certeza que deseja deletar a tarefa #${id}?`)) return;
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert(`✅ Tarefa #${id} deletada com sucesso!`);
+                    carregarTarefas();
+                } else {
+                    throw new Error('Erro ao deletar');
+                }
+                
+            } catch (erro) {
+                alert(`❌ Erro: ${erro.message}`);
+            }
+        }
+
+        // LIMPAR TODAS AS TAREFAS
+        async function limparTodasTarefas() {
+            if (!confirm('⚠️ ATENÇÃO: Isso vai deletar TODAS as tarefas do banco. Tem certeza?')) return;
+            
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = '✅ Todas as tarefas foram removidas do banco.';
+                    messageDiv.style.display = 'block';
+                    
+                    carregarTarefas();
+                } else {
+                    throw new Error('Erro ao limpar tarefas');
+                }
+                
+            } catch (erro) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = `❌ <strong>ERRO:</strong><br>${erro.message}`;
+                messageDiv.style.display = 'block';
+            }
+        }
+
+        // CARREGAR TAREFAS AO INICIAR
+        carregarTarefas();
+    </script>
+</body>
+</html>
