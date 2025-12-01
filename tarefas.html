@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarefas - CICLONE</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #f5f5f5;
+        color: #333;
+        padding: 20px;
+    }
+
+    .header {
+        background: #0066cc;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .tarefas-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .tarefa-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-left: 5px solid #0066cc;
+    }
+
+    .tarefa-titulo {
+        color: #0066cc;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .tarefa-descricao {
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+
+    .tarefa-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .tarefa-valor {
+        background: #198754;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .btn-executar {
+        background: #0066cc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-executar:hover {
+        background: #0055aa;
+    }
+
+    .status {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-weight: bold;
+    }
+
+    .status-ativa { background: #d4edda; color: #155724; }
+    .status-concluida { background: #f8f9fa; color: #6c757d; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📋 Tarefas Disponíveis</h1>
+    <p>Execute tarefas e ganhe dinheiro</p>
+</div>
+
+<div class="tarefas-container" id="tarefasContainer">
+    <!-- Tarefas serão carregadas aqui -->
+</div>
+
+<script>
+// Configuração Supabase
+const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+// Buscar tarefas do Supabase
+async function carregarTarefas() {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?status=eq.ativa`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Erro ao carregar tarefas');
+        
+        const tarefas = await response.json();
+        mostrarTarefas(tarefas);
+        
+    } catch (erro) {
+        console.error('Erro:', erro);
+        mostrarTarefasVazias();
+    }
+}
+
+// Mostrar tarefas na tela
+function mostrarTarefas(tarefas) {
+    const container = document.getElementById('tarefasContainer');
+    
+    if (!tarefas || tarefas.length === 0) {
+        mostrarTarefasVazias();
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    tarefas.forEach(tarefa => {
+        const card = document.createElement('div');
+        card.className = 'tarefa-card';
+        
+        card.innerHTML = `
+            <div class="tarefa-titulo">${tarefa.titulo}</div>
+            <div class="tarefa-descricao">${tarefa.descricao}</div>
+            <div class="tarefa-info">
+                <span class="tarefa-valor">R$ ${parseFloat(tarefa.valor).toFixed(2)}</span>
+                <span class="status status-${tarefa.status}">${tarefa.status}</span>
+                <button class="btn-executar" onclick="executarTarefa(${tarefa.id})" ${tarefa.status !== 'ativa' ? 'disabled' : ''}>
+                    EXECUTAR
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+// Mostrar mensagem se não houver tarefas
+function mostrarTarefasVazias() {
+    const container = document.getElementById('tarefasContainer');
+    container.innerHTML = `
+        <div class="tarefa-card">
+            <div class="tarefa-titulo">Nenhuma tarefa disponível no momento</div>
+            <div class="tarefa-descricao">Volte mais tarde para novas tarefas.</div>
+        </div>
+    `;
+}
+
+// Executar uma tarefa
+function executarTarefa(tarefaId) {
+    // Redireciona para a página da tarefa específica
+    window.location.href = `ver-tarefa.html?id=${tarefaId}`;
+}
+
+// Carregar tarefas ao abrir a página
+carregarTarefas();
+</script>
+
+</body>
+</html>
