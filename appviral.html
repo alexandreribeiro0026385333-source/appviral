@@ -165,8 +165,13 @@
                 `;
                 document.getElementById('userInfo').style.display = 'block';
                 
-                // Configurar botão de tarefas
+                // Configurar botão de tarefas - CORRIGIDO
                 document.getElementById('btnTarefas').onclick = function() {
+                    // SALVAR ID NO LOCALSTORAGE
+                    localStorage.setItem('user_id', userId);
+                    localStorage.setItem('user_email', userEmail);
+                    
+                    // Redirecionar para tarefas
                     window.location.href = `tarefas.html?id=${userId}&email=${encodeURIComponent(userEmail)}`;
                 };
                 
