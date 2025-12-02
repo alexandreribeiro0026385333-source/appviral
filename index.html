@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CICLONE PTC - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .links-section {
+            margin-bottom: 30px;
+        }
+        
+        .link-card {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            color: #333;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .link-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .link-text {
+            flex: 1;
+        }
+        
+        .link-text h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .link-text p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .login-section {
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #4CAF50;
+        }
+        
+        .login-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .btn-login {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: #45a049;
+        }
+        
+        .message {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #666;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🚀 CICLONE PTC</h1>
+            <p>Ganhe dinheiro completando tarefas simples!</p>
+        </div>
+        
+        <div class="links-section">
+            <a href="https://ciclone-62mq.onrender.com/register.html" target="_blank" class="link-card">
+                <div class="link-icon">👤</div>
+                <div class="link-text">
+                    <h3>Cadastro Ciclone PTC</h3>
+                    <p>Faça seu cadastro e ganhe R$ 5,00 de bônus</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/" target="_blank" class="link-card">
+                <div class="link-icon">💬</div>
+                <div class="link-text">
+                    <h3>CICLONE PTC</h3>
+                    <p>Acesse o site principal do CICLONE PTC</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/viewads-botton.html" target="_blank" class="link-card">
+                <div class="link-icon">💰</div>
+                <div class="link-text">
+                    <h3>Ver Anúncios</h3>
+                    <p>Complete tarefas e ganhe dinheiro</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/produtos.html" target="_blank" class="link-card">
+                <div class="link-icon">⭐</div>
+                <div class="link-text">
+                    <h3>Avaliar Produtos</h3>
+                    <p>Avalie produtos e ganhe recompensas</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+        </div>
+        
+        <div class="login-section">
+            <h2>🔐 Acesso Rápido</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Digite seu e-mail cadastrado:</label>
+                    <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
+                </div>
+                
+                <button type="submit" class="btn-login" id="loginBtn">
+                    Entrar no Painel
+                </button>
+                
+                <div class="loading" id="loading">
+                    Verificando e-mail...
+                </div>
+                
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 CICLONE PTC - Todos os direitos reservados</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingDiv = document.getElementById('loading');
+            const messageDiv = document.getElementById('message');
+            
+            if (!email) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Digite seu e-mail!';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            messageDiv.style.display = 'none';
+            
+            try {
+                // Buscar usuário pelo email
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/appviral?select=id,email,nome,saldo&email=ilike.${encodeURIComponent(email)}`, 
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Erro ao verificar e-mail');
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    // Usuário não encontrado
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = '❌ E-mail não cadastrado!<br><a href="https://ciclone-62mq.onrender.com/register.html" target="_blank" style="color:#721c24;font-weight:bold;">Clique aqui para se cadastrar</a>';
+                    messageDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loadingDiv.style.display = 'none';
+                    return;
+                }
+                
+                const usuario = data[0];
+                
+                // Atualizar última atividade
+                await fetch(`${SUPABASE_URL}/rest/v1/appviral?id=eq.${usuario.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        last_active: new Date().toISOString(),
+                        status_online: true
+                    })
+                });
+                
+                // Redirecionar para appviral.html com o ID do usuário
+                localStorage.setItem('user_id', usuario.id);
+                localStorage.setItem('user_email', usuario.email);
+                localStorage.setItem('user_name', usuario.nome);
+                localStorage.setItem('user_balance', usuario.saldo);
+                
+                // Mensagem de sucesso
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = `✅ Login bem-sucedido!<br>Redirecionando...`;
+                messageDiv.style.display = 'block';
+                
+                // Redirecionar após 1.5 segundos
+                setTimeout(() => {
+                    window.location.href = `appviral.html?id=${usuario.id}&email=${encodeURIComponent(usuario.email)}`;
+                }, 1500);
+                
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Erro ao fazer login:<br>' + error.message;
+                messageDiv.style.display = 'block';
+                loginBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        });
+
+        // Verificar se já tem dados no localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('user_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+            }
+        });
+    </script>
+</body>
+</html>
