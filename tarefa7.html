@@ -250,7 +250,7 @@
                 
                 // ATUALIZA SALDO (+R$ 5,00)
                 const saldoAtual = parseFloat(usuario.saldo) || 0;
-                const novoSaldo = saldoAtual + 5.00;
+                const novoSaldo = saldoAtual + 0,50;
                 
                 const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/appviral?email=eq.${encodeURIComponent(email)}`, {
                     method: 'PATCH',
