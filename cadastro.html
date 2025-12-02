@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarefa 2 - Cadastro</title>
+    <title>Cadastro - App Viral</title>
     <style>
         * {
             margin: 0;
@@ -115,11 +115,6 @@
             background: #f57c00;
         }
         
-        .btn-next {
-            background: #9C27B0;
-            margin-top: 15px;
-        }
-        
         .footer {
             margin-top: 30px;
             color: #666;
@@ -175,7 +170,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="badge">💰 TAREFA 2 - Cadastro</div>
+        <div class="badge">💰 CADASTRO</div>
         
         <h1>Complete seu Cadastro</h1>
         <p class="subtitle">Preencha o formulário abaixo para ganhar <strong>R$ 5,00</strong> extras!</p>
@@ -218,7 +213,7 @@
             </div>
 
             <button type="submit" class="btn" id="submitBtn">
-                ✅ Finaliza o cadastro pra ganhar mais R$ 5,00
+                ✅ Finalizar Cadastro
             </button>
             
             <a href="ajuda.html" class="btn btn-help">
@@ -230,8 +225,8 @@
         
         <div class="footer">
             Obrigado por usar o App, continua ganhando ! 🚀
-            <a href="tarefa3.html" class="btn btn-help" style="margin-top: 10px;">
-                $ Proxima tarefa mais 5,00 
+            <a href="tarefas.html" class="btn btn-help" style="margin-top: 10px;">
+                $ Voltar para tarefas
             </a>
         </div>
     </div>
@@ -299,8 +294,8 @@
                         <div class="copy-hint">📋 CLIQUE NO CÓDIGO PARA COPIAR</div>
                         <div class="uuid-code" onclick="copiarCodigo(this)">${formData.indicador_code}</div>
                         <br>
-                        <a href="tarefa3.html" class="btn btn-next">
-                            🚀 Ir para Próxima Tarefa + R$ 5,00
+                        <a href="tarefas.html" class="btn" style="background: #9C27B0;">
+                            🚀 Ir para Tarefas
                         </a>
                     `;
                     messageDiv.style.display = 'block';
@@ -318,7 +313,7 @@
                 messageDiv.style.display = 'block';
                 
                 submitBtn.disabled = false;
-                submitBtn.textContent = '✅ Tentar Novamente - Ganhar R$ 5,00';
+                submitBtn.textContent = '✅ Tentar Novamente';
             }
         });
 
