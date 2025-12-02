@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Clicks Tarefas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #2c3e50; color: white; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; background: #34495e; border-radius: 10px; }
+        h1 { color: #1abc9c; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #3498db; padding: 15px; border-radius: 8px; text-align: center; }
+        table { width: 100%; background: white; color: #333; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 12px; }
+        th { background: #1abc9c; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #e8f4f8; }
+        .controls { display: flex; gap: 10px; margin: 20px 0; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+        .btn-primary { background: #1abc9c; }
+        .btn-primary:hover { background: #16a085; }
+        .btn-danger { background: #e74c3c; }
+        .loading { text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖱️ PAINEL - Clicks Tarefas</h1>
+            <p>Registro de todos os cliques em tarefas</p>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="carregarDados()">🔄 Atualizar Dados</button>
+                <button class="btn btn-danger" onclick="limparTela()">🗑️ Limpar Tela</button>
+            </div>
+            <div class="stats" id="stats"></div>
+        </div>
+        
+        <div id="loading" class="loading">Carregando dados da tabela clicks_tarefas...</div>
+        <div id="dataContainer"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        async function carregarDados() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('dataContainer').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/clicks_tarefas?select=*`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Erro ao buscar dados');
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    document.getElementById('dataContainer').innerHTML = '<p style="text-align:center;padding:30px;">Nenhum dado encontrado</p>';
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+                
+                exibirEstatisticas(data);
+                exibirTabela(data);
+                document.getElementById('loading').style.display = 'none';
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<p style="color:red;">Erro: ${error.message}</p>`;
+            }
+        }
+
+        function exibirEstatisticas(data) {
+            const totalClicks = data.length;
+            const hoje = new Date().toDateString();
+            const clicksHoje = data.filter(click => 
+                new Date(click.data_click).toDateString() === hoje
+            ).length;
+            const usuariosUnicos = [...new Set(data.map(click => click.usuario_email))].length;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <h3>🖱️ Total Clicks</h3>
+                    <p>${totalClicks}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📅 Hoje</h3>
+                    <p>${clicksHoje}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>👥 Usuários Únicos</h3>
+                    <p>${usuariosUnicos}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Tarefas Diferentes</h3>
+                    <p>${[...new Set(data.map(click => click.tarefa_id))].length}</p>
+                </div>
+            `;
+        }
+
+        function exibirTabela(data) {
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tarefa ID</th>
+                            <th>Usuário Email</th>
+                            <th>Data Click</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.forEach(click => {
+                html += `
+                    <tr>
+                        <td>${click.id}</td>
+                        <td>${click.tarefa_id || '-'}</td>
+                        <td>${click.usuario_email || '-'}</td>
+                        <td>${click.data_click ? new Date(click.data_click).toLocaleString() : '-'}</td>
+                        <td>${click.ip_address || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+
+        function limparTela() {
+            document.getElementById('dataContainer').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+        }
+
+        window.onload = carregarDados;
+    </script>
+</body>
+</html>
