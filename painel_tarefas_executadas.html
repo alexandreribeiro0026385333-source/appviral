@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Tarefas Executadas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #2c3e50; color: white; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; background: #34495e; border-radius: 10px; }
+        h1 { color: #1abc9c; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #3498db; padding: 15px; border-radius: 8px; text-align: center; }
+        table { width: 100%; background: white; color: #333; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 12px; }
+        th { background: #1abc9c; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #e8f4f8; }
+        .controls { display: flex; gap: 10px; margin: 20px 0; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+        .btn-primary { background: #1abc9c; }
+        .btn-primary:hover { background: #16a085; }
+        .btn-danger { background: #e74c3c; }
+        .loading { text-align: center; padding: 30px; }
+        .status-concluida { color: #27ae60; font-weight: bold; }
+        .status-pendente { color: #f39c12; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ PAINEL - Tarefas Executadas</h1>
+            <p>Histórico de todas as tarefas executadas pelos usuários</p>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="carregarDados()">🔄 Atualizar Dados</button>
+                <button class="btn btn-danger" onclick="limparTela()">🗑️ Limpar Tela</button>
+            </div>
+            <div class="stats" id="stats"></div>
+        </div>
+        
+        <div id="loading" class="loading">Carregando dados da tabela tarefas_executadas...</div>
+        <div id="dataContainer"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        async function carregarDados() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('dataContainer').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas_executadas?select=*`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Erro ao buscar dados');
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    document.getElementById('dataContainer').innerHTML = '<p style="text-align:center;padding:30px;">Nenhuma tarefa executada encontrada</p>';
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+                
+                exibirEstatisticas(data);
+                exibirTabela(data);
+                document.getElementById('loading').style.display = 'none';
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<p style="color:red;">Erro: ${error.message}</p>`;
+            }
+        }
+
+        function exibirEstatisticas(data) {
+            const totalExecucoes = data.length;
+            const hoje = new Date().toDateString();
+            const hojeCount = data.filter(exec => 
+                new Date(exec.data_execucao).toDateString() === hoje
+            ).length;
+            const usuariosUnicos = [...new Set(data.map(exec => exec.usuario_email))].length;
+            const concluidas = data.filter(exec => exec.status === 'concluida').length;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <h3>✅ Total Execuções</h3>
+                    <p>${totalExecucoes}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📅 Hoje</h3>
+                    <p>${hojeCount}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>👥 Usuários Únicos</h3>
+                    <p>${usuariosUnicos}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🏁 Concluídas</h3>
+                    <p>${concluidas}</p>
+                </div>
+            `;
+        }
+
+        function exibirTabela(data) {
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tarefa ID</th>
+                            <th>Usuário Email</th>
+                            <th>Data Execução</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.forEach(exec => {
+                const statusClass = exec.status === 'concluida' ? 'status-concluida' : 'status-pendente';
+                
+                html += `
+                    <tr>
+                        <td>${exec.id}</td>
+                        <td>${exec.tarefa_id || '-'}</td>
+                        <td>${exec.usuario_email || '-'}</td>
+                        <td>${exec.data_execucao ? new Date(exec.data_execucao).toLocaleString() : '-'}</td>
+                        <td class="${statusClass}">${exec.status || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+
+        function limparTela() {
+            document.getElementById('dataContainer').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+        }
+
+        window.onload = carregarDados;
+    </script>
+</body>
+</html>
