@@ -3,155 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel - appviral</title>
+    <title>Meus Dados - CICLONE PTC</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #2c3e50; color: white; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; padding: 20px; background: #34495e; border-radius: 10px; }
         h1 { color: #1abc9c; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .stat-card { background: #3498db; padding: 15px; border-radius: 8px; text-align: center; }
-        table { width: 100%; background: white; color: #333; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 12px; }
-        th { background: #1abc9c; color: white; position: sticky; top: 0; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        tr:hover { background: #e8f4f8; }
-        .controls { display: flex; gap: 10px; margin: 20px 0; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; }
-        .btn-primary { background: #1abc9c; }
+        .login-section { background: #34495e; padding: 25px; border-radius: 15px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-primary { background: #1abc9c; width: 100%; }
         .btn-primary:hover { background: #16a085; }
-        .btn-danger { background: #e74c3c; }
+        .message { padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
         .loading { text-align: center; padding: 30px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 10px; width: 80%; max-height: 80vh; overflow-y: auto; color: #333; }
+        .user-data { background: #34495e; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .data-item { background: #2c3e50; padding: 15px; border-radius: 8px; }
+        .data-label { color: #95a5a6; font-size: 14px; margin-bottom: 5px; }
+        .data-value { font-size: 16px; font-weight: bold; }
+        .saldo-box { background: #27ae60; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px; }
+        .saldo-label { font-size: 18px; margin-bottom: 10px; }
+        .saldo-value { font-size: 36px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 PAINEL - appviral</h1>
-            <p>Todos os usuários cadastrados no sistema</p>
-            <div class="controls">
-                <button class="btn btn-primary" onclick="carregarDados()">🔄 Atualizar Dados</button>
-                <button class="btn btn-danger" onclick="limparTela()">🗑️ Limpar Tela</button>
-            </div>
-            <div class="stats" id="stats"></div>
+            <h1>👤 MEUS DADOS - CICLONE PTC</h1>
+            <p>Consulte suas informações e saldo</p>
         </div>
         
-        <div id="loading" class="loading">Carregando dados da tabela appviral...</div>
-        <div id="dataContainer"></div>
+        <div class="login-section">
+            <h2 style="text-align: center; margin-bottom: 20px;">🔑 Digite seu e-mail</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="email" name="email" required placeholder="Seu e-mail cadastrado">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    Buscar Meus Dados
+                </button>
+                
+                <div class="loading" id="loading" style="display: none;">
+                    Buscando seus dados...
+                </div>
+                
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+
+        <!-- DADOS DO USUÁRIO -->
+        <div class="user-data" id="userData">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #1abc9c;">📋 SEUS DADOS</h2>
+            
+            <div class="saldo-box">
+                <div class="saldo-label">💰 SEU SALDO ATUAL</div>
+                <div class="saldo-value" id="userSaldo">R$ 0,00</div>
+            </div>
+            
+            <div class="data-grid" id="dataGrid"></div>
+        </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-        async function carregarDados() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('dataContainer').innerHTML = '';
-            document.getElementById('stats').innerHTML = '';
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingDiv = document.getElementById('loading');
+            const messageDiv = document.getElementById('message');
+            const userDataDiv = document.getElementById('userData');
+            const dataGrid = document.getElementById('dataGrid');
+            
+            if (!email) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Digite seu e-mail!';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            messageDiv.style.display = 'none';
+            userDataDiv.style.display = 'none';
             
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/appviral?select=*`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Accept': 'application/json'
+                // Buscar TODOS os dados do usuário pelo email
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/appviral?select=*&email=ilike.${encodeURIComponent(email)}`, 
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Accept': 'application/json'
+                        }
                     }
-                });
+                );
                 
                 if (!response.ok) throw new Error('Erro ao buscar dados');
+                
                 const data = await response.json();
                 
                 if (data.length === 0) {
-                    document.getElementById('dataContainer').innerHTML = '<p style="text-align:center;padding:30px;">Nenhum dado encontrado na tabela appviral</p>';
-                    document.getElementById('loading').style.display = 'none';
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = '❌ E-mail não encontrado!';
+                    messageDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loadingDiv.style.display = 'none';
                     return;
                 }
                 
-                exibirEstatisticas(data);
-                exibirTabela(data);
-                document.getElementById('loading').style.display = 'none';
+                const usuario = data[0];
+                
+                // Mostrar saldo
+                document.getElementById('userSaldo').textContent = `R$ ${parseFloat(usuario.saldo || 0).toFixed(2)}`;
+                
+                // Mostrar todos os dados em grid
+                let html = '';
+                
+                // Dados principais
+                const dadosPrincipais = [
+                    { label: 'Nome Completo', value: usuario.nome || 'Não informado' },
+                    { label: 'E-mail', value: usuario.email || 'Não informado' },
+                    { label: 'Telefone', value: usuario.telefone || 'Não informado' },
+                    { label: 'Chave PIX', value: usuario.chave_pix || 'Não informado' },
+                    { label: 'Nome na Conta PIX', value: usuario.pix_nome || 'Não informado' },
+                    { label: 'Código de Indicação', value: usuario.indicador_code || 'Não gerado' },
+                    { label: 'Indicações Realizadas', value: usuario.indicados_count || 0 },
+                    { label: 'Bônus Acumulado', value: `R$ ${parseFloat(usuario.bonus || 0).toFixed(2)}` },
+                    { label: 'Prêmios', value: `R$ ${parseFloat(usuario.premio || 0).toFixed(2)}` },
+                    { label: 'Status', value: usuario.status_online ? '🟢 Online' : '🔴 Offline' },
+                    { label: 'Última Atividade', value: usuario.last_active ? new Date(usuario.last_active).toLocaleString() : 'Nunca' },
+                    { label: 'Data de Cadastro', value: usuario.data_cadastro ? new Date(usuario.data_cadastro).toLocaleString() : 'Não informada' }
+                ];
+                
+                dadosPrincipais.forEach(item => {
+                    html += `
+                        <div class="data-item">
+                            <div class="data-label">${item.label}</div>
+                            <div class="data-value">${item.value}</div>
+                        </div>
+                    `;
+                });
+                
+                // URLs adicionais se existirem
+                if (usuario.blogsite || usuario.urlvideo || usuario.urlnegocio) {
+                    html += `<div class="data-item" style="grid-column: 1 / -1; background: #1a252f;">`;
+                    html += `<div class="data-label">📎 LINKS ADICIONAIS</div>`;
+                    
+                    if (usuario.blogsite) {
+                        html += `<div class="data-value" style="margin-top: 5px;">🌐 Blog: ${usuario.blogsite}</div>`;
+                    }
+                    if (usuario.urlvideo) {
+                        html += `<div class="data-value" style="margin-top: 5px;">🎬 Vídeo: ${usuario.urlvideo}</div>`;
+                    }
+                    if (usuario.urlnegocio) {
+                        html += `<div class="data-value" style="margin-top: 5px;">💼 Negócio: ${usuario.urlnegocio}</div>`;
+                    }
+                    if (usuario.urlsound) {
+                        html += `<div class="data-value" style="margin-top: 5px;">🔊 Áudio: ${usuario.urlsound}</div>`;
+                    }
+                    
+                    html += `</div>`;
+                }
+                
+                // Última mensagem
+                if (usuario.mensagem) {
+                    html += `
+                        <div class="data-item" style="grid-column: 1 / -1; background: #1a252f;">
+                            <div class="data-label">💬 ÚLTIMA MENSAGEM</div>
+                            <div class="data-value">${usuario.mensagem}</div>
+                        </div>
+                    `;
+                }
+                
+                dataGrid.innerHTML = html;
+                
+                // Mostrar dados do usuário
+                userDataDiv.style.display = 'block';
+                
+                // Mensagem de sucesso
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = `✅ Dados carregados com sucesso!`;
+                messageDiv.style.display = 'block';
+                
+                // Salvar email no localStorage
+                localStorage.setItem('user_email', email);
+                
+                loginBtn.disabled = false;
+                loadingDiv.style.display = 'none';
                 
             } catch (error) {
-                document.getElementById('loading').innerHTML = `<p style="color:red;">Erro: ${error.message}</p>`;
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Erro ao buscar dados:<br>' + error.message;
+                messageDiv.style.display = 'block';
+                loginBtn.disabled = false;
+                loadingDiv.style.display = 'none';
             }
-        }
+        });
 
-        function exibirEstatisticas(data) {
-            const totalUsuarios = data.length;
-            const totalSaldo = data.reduce((sum, user) => sum + (parseFloat(user.saldo) || 0), 0);
-            const onlineCount = data.filter(user => user.status_online).length;
-            const comIndicacoes = data.filter(user => user.indicados_count > 0).length;
-            
-            document.getElementById('stats').innerHTML = `
-                <div class="stat-card">
-                    <h3>👥 Total Usuários</h3>
-                    <p>${totalUsuarios}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>💰 Saldo Total</h3>
-                    <p>R$ ${totalSaldo.toFixed(2)}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>🟢 Online</h3>
-                    <p>${onlineCount}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>📊 Indicações</h3>
-                    <p>${comIndicacoes}</p>
-                </div>
-            `;
-        }
-
-        function exibirTabela(data) {
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Chave PIX</th>
-                            <th>Saldo</th>
-                            <th>Indicações</th>
-                            <th>Código</th>
-                            <th>Status</th>
-                            <th>Cadastro</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            data.forEach(user => {
-                html += `
-                    <tr>
-                        <td title="${user.id}">${user.id.substring(0, 8)}...</td>
-                        <td>${user.nome || ''}</td>
-                        <td>${user.email || ''}</td>
-                        <td>${user.telefone || ''}</td>
-                        <td title="${user.chave_pix || ''}">${(user.chave_pix || '').substring(0, 15)}...</td>
-                        <td>R$ ${parseFloat(user.saldo || 0).toFixed(2)}</td>
-                        <td>${user.indicados_count || 0}</td>
-                        <td title="${user.indicador_code || ''}">${(user.indicador_code || '').substring(0, 10)}...</td>
-                        <td>${user.status_online ? '🟢 Online' : '🔴 Offline'}</td>
-                        <td>${user.data_cadastro ? new Date(user.data_cadastro).toLocaleDateString() : ''}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            document.getElementById('dataContainer').innerHTML = html;
-        }
-
-        function limparTela() {
-            document.getElementById('dataContainer').innerHTML = '';
-            document.getElementById('stats').innerHTML = '';
-        }
-
-        window.onload = carregarDados;
+        // Verificar se já tem email no localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('user_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+            }
+        });
     </script>
 </body>
 </html>
