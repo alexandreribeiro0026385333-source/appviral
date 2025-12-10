@@ -7,6 +7,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* MENU RETRÁTIL */
+        .menu-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            background: #222;
+            color: #ffd54a;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            transition: background 0.2s;
+        }
+        .menu-btn:hover { background: #333; }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 230px;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            overflow-y: auto;
+            transform: translateX(-250px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding-top: 60px;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+        }
+        .side-menu.open { transform: translateX(0); }
+
+        .side-menu a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+            padding: 12px 15px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #222;
+        }
+        .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+        .side-menu i {
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
+            color: gold;
+        }
+
         /* ESTILOS DO HEADER */
         .header-container {
             margin: 0;
@@ -14,6 +66,7 @@
             padding: 10px 20px;
             border-bottom: 4px solid #ffcc00;
             font-family: Arial, sans-serif;
+            margin-top: 40px;
         }
 
         /* CONTAINER DO LOGO E MENU DO HEADER */
@@ -215,6 +268,35 @@
             color: #00aaff;
         }
 
+        /* ZAP BOX */
+        #zap-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background-color: #25D366;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            transition: 0.2s ease;
+        }
+
+        #zap-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+        }
+
+        #zap-box img {
+            width: 30px;
+        }
+
         /* ANIMAÇÃO DO LOGO */
         @keyframes rotate {
             0% { transform: rotate(0deg); }
@@ -251,14 +333,28 @@
 </head>
 <body>
 
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+
+<nav class="side-menu" id="menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
+  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
+  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+</nav>
+
     <!-- HEADER DA PÁGINA -->
     <div class="header-container">
         <div class="header-top">
             <div class="logo">CiClone</div>
             <div class="menu">
-                <a href="viewads-botton.html" target="_top">Ver Anúncios</a>
-                <a href="login-top.html" target="_top">Conta</a>
-                <a href="estatisticas.html" target="_top">Painel</a>
+                <a href="viewads-botton.html">Ver Anúncios</a>
+                <a href="login-top.html">Conta</a>
+                <a href="estatisticas.html">Painel</a>
             </div>
         </div>
 
@@ -313,14 +409,32 @@
     <!-- FOOTER DA PÁGINA -->
     <div class="footer-container">
         <nav class="footer-nav">
-            <a href="viewads-botton.html" target="_top">Ganhar Dinheiro</a>
-            <a href="estatisticas.html" target="_top">PAINEL</a>
-            <a href="login-top.html" target="_top">Conta</a>
-            <a href="register.html" target="_top">Cadastro</a>
+            <a href="viewads-botton.html">Ganhar Dinheiro</a>
+            <a href="estatisticas.html">PAINEL</a>
+            <a href="login-top.html">Conta</a>
+            <a href="register.html">Cadastro</a>
         </nav>
     </div>
 
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+    Atendimento
+</a>
+
     <script>
+        function toggleMenu() {
+            document.getElementById('menu').classList.toggle('open');
+        }
+
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('menu');
+            const btn = document.querySelector('.menu-btn');
+            if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+                menu.classList.remove('open');
+            }
+        });
+
         // CONFIGURAÇÕES SUPABASE (mantidas do seu código original)
         const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
