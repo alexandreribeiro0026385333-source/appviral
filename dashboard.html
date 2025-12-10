@@ -3,234 +3,487 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel - CICLONE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>CICLONE - Dashboard</title>
 <style>
-    body { margin: 0; background: #eef2f5; font-family: Arial, sans-serif; }
-    .header { background: #0066cc; color: white; padding: 15px; text-align: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 20; font-size: 19px; font-weight: bold; }
-    .menu { margin-top: 70px; display: flex; justify-content: space-around; background: #fff; padding: 10px 0; border-bottom: 1px solid #ccc; }
-    .menu a { text-decoration: none; color: #0066cc; font-weight: bold; font-size: 15px; }
-    .saldo-info { background: #198754; color: white; padding: 15px; margin: 10px 20px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; }
-    .user-info { background: white; margin: 10px 20px; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.15); }
-    .info-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-    .info-item:last-child { border-bottom: none; }
-    .info-label { font-weight: bold; color: #555; }
-    .info-value { color: #333; }
-    .grid { padding: 20px; display: grid; gap: 15px; grid-template-columns: repeat(2, 1fr); }
-    .box { background: white; padding: 25px 10px; border-radius: 8px; text-align: center; font-size: 17px; font-weight: bold; color: #333; box-shadow: 0 0 8px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s; }
-    .box:hover { transform: scale(1.06); box-shadow: 0 0 12px rgba(0,0,0,0.25); }
-    .stats-box { background: white; margin: 10px 20px; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.15); }
-    .stats-title { font-weight: bold; color: #0066cc; margin-bottom: 10px; }
+  body {
+    background: #000;
+    color: gold;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: #222;
+    color: #ffd54a;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transition: background 0.2s;
+  }
+  .menu-btn:hover { background: #333; }
+
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    overflow-y: auto;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+  }
+  .side-menu.open { transform: translateX(0); }
+
+  .side-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 15px;
+    transition: background 0.2s;
+    border-bottom: 1px solid #222;
+  }
+  .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+  .side-menu i {
+    width: 24px;
+    margin-right: 12px;
+    text-align: center;
+    color: gold;
+  }
+
+  main {
+    padding: 20px;
+    margin-top: 60px;
+    min-height: 100vh;
+  }
+
+  .header-dash {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .saldo-box {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .info-card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+  }
+
+  .info-card h3 {
+    color: gold;
+    margin-top: 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+  }
+
+  .info-item:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #aaa;
+  }
+
+  .info-value {
+    color: white;
+    font-weight: bold;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .action-btn {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    text-align: center;
+  }
+
+  .action-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-3px);
+  }
+
+  .action-btn.green { background: #198754; }
+  .action-btn.green:hover { background: #157347; }
+  .action-btn.orange { background: #fd7e14; }
+  .action-btn.orange:hover { background: #e8590c; }
+  .action-btn.red { background: #dc3545; }
+  .action-btn.red:hover { background: #c82333; }
+
+  .stats-box {
+    background: rgba(255,215,0,0.05);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 30px;
+    color: gold;
+  }
+
+  #zap-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #25D366;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+  }
+
+  #zap-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+  }
+
+  #zap-box img {
+    width: 30px;
+  }
 </style>
 </head>
-<body onload="carregarDadosUsuario()">
+<body>
 
-<div class="header">Painel CICLONE</div>
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
 
-<div class="menu">
-    <a href="#">Conta</a>
-    <a href="viewads-botton.html">Ganhe Dinheiro</a>
-    <a href="#" onclick="logout()">Sair</a>
-</div>
+<nav class="side-menu" id="menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="#"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
+  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
+  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+  <a href="#"><i class="fas fa-credit-card"></i> Cartão</a>
+  <a href="#"><i class="fas fa-file-invoice-dollar"></i> Extrato</a>
+</nav>
 
-<div class="saldo-info" id="saldoInfo">Carregando saldo...</div>
+<main>
+  <div class="header-dash">
+    <h1><i class="fas fa-tachometer-alt"></i> Painel CICLONE</h1>
+    <p id="welcomeMessage">Carregando dados...</p>
+  </div>
 
-<div class="user-info">
-    <div class="info-item">
+  <div class="saldo-box">
+    <div><i class="fas fa-wallet"></i> Saldo Disponível</div>
+    <div id="saldoTotal">R$ 0,0000</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3><i class="fas fa-user"></i> Dados Pessoais</h3>
+      <div class="info-item">
         <span class="info-label">ID:</span>
         <span class="info-value" id="userId">-</span>
-    </div>
-    <div class="info-item">
-        <span class="info-label">Email:</span>
-        <span class="info-value" id="userEmail">-</span>
-    </div>
-    <div class="info-item">
+      </div>
+      <div class="info-item">
         <span class="info-label">Nome:</span>
         <span class="info-value" id="userNome">-</span>
-    </div>
-    <div class="info-item">
-        <span class="info-label">Chave PIX:</span>
-        <span class="info-value" id="userPix">-</span>
-    </div>
-    <div class="info-item">
+      </div>
+      <div class="info-item">
+        <span class="info-label">Email:</span>
+        <span class="info-value" id="userEmail">-</span>
+      </div>
+      <div class="info-item">
         <span class="info-label">Telefone:</span>
         <span class="info-value" id="userTelefone">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Cadastro:</span>
+        <span class="info-value" id="userCadastro">-</span>
+      </div>
     </div>
-    <div class="info-item">
-        <span class="info-label">Data de Cadastro:</span>
-        <span class="info-value" id="userDataCadastro">-</span>
-    </div>
-</div>
 
-<div class="stats-box">
-    <div class="stats-title">📊 ESTATÍSTICAS DE CLICKS</div>
-    <div class="info-item">
+    <div class="info-card">
+      <h3><i class="fas fa-chart-bar"></i> Estatísticas de Cliques</h3>
+      <div class="info-item">
         <span class="info-label">Total de Cliques:</span>
         <span class="info-value" id="totalClicks">0</span>
-    </div>
-    <div class="info-item">
+      </div>
+      <div class="info-item">
         <span class="info-label">Cliques Hoje:</span>
         <span class="info-value" id="clicksHoje">0</span>
-    </div>
-    <div class="info-item">
-        <span class="info-label">Último Click:</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Último Clique:</span>
         <span class="info-value" id="ultimoClick">Nunca</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Média por Dia:</span>
+        <span class="info-value" id="mediaDia">0</span>
+      </div>
     </div>
-</div>
 
-<div class="stats-box">
-    <div class="stats-title">💰 SISTEMA DE CRÉDITOS</div>
-    <div class="info-item">
+    <div class="info-card">
+      <h3><i class="fas fa-cogs"></i> Configurações da Conta</h3>
+      <div class="info-item">
+        <span class="info-label">Status:</span>
+        <span class="info-value" id="statusConta">Free</span>
+      </div>
+      <div class="info-item">
         <span class="info-label">Recebendo Créditos:</span>
         <span class="info-value" id="recebendoCreditos">Não</span>
-    </div>
-    <div class="info-item">
+      </div>
+      <div class="info-item">
         <span class="info-label">Limite Atingido:</span>
         <span class="info-value" id="limiteAtingido">Não</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Chave PIX:</span>
+        <span class="info-value" id="userPix">Não cadastrada</span>
+      </div>
     </div>
-    <div class="info-item">
-        <span class="info-label">Saldo para Retirada:</span>
-        <span class="info-value" id="saldoRetirada">R$ 0,00</span>
-    </div>
-</div>
+  </div>
 
-<div class="grid">
-    <div class="box" onclick="irParaAnuncios()">Ver Anúncios</div>
-    <div class="box" onclick="sacarDinheiro()">Sacar Dinheiro</div>
-    <div class="box" onclick="fazerUpgrade()">Fazer Upgrade</div>
-</div>
+  <div class="actions-grid">
+    <button class="action-btn green" onclick="window.location.href='viewads-botton.html'">
+      <i class="fas fa-ad"></i> Ver Anúncios
+    </button>
+    <button class="action-btn" onclick="sacarDinheiro()">
+      <i class="fas fa-money-bill-wave"></i> Sacar PIX
+    </button>
+    <button class="action-btn orange" onclick="fazerUpgrade()">
+      <i class="fas fa-rocket"></i> Fazer Upgrade
+    </button>
+    <button class="action-btn red" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+  </div>
+
+  <div class="stats-box">
+    <h3><i class="fas fa-info-circle"></i> Informações do Sistema</h3>
+    <p>• Valor por clique: R$ 0,0001</p>
+    <p>• Saque mínimo: R$ 10,00</p>
+    <p>• Conta Free não recebe pagamentos</p>
+    <p>• Upgrade para PRO: R$ 15,00 (whatsapp 21 99910-2951)</p>
+  </div>
+</main>
+
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+  Atendimento
+</a>
 
 <script>
-async function carregarDadosUsuario() {
+  // CREDENCIAIS SUPABASE
+  const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+  // Cliente Supabase
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+  }
+
+  // Verifica se usuário está logado
+  window.addEventListener('DOMContentLoaded', async () => {
     const user = JSON.parse(localStorage.getItem('user'));
     
     if (!user || !user.id) {
-        window.location.href = 'login-top.html';
-        return;
+      window.location.href = 'login-top.html';
+      return;
     }
 
+    // Carrega dados do usuário
+    await carregarDadosUsuario(user.id);
+    
+    // Carrega estatísticas de cliques
+    await carregarEstatisticasCliques(user.id);
+  });
+
+  async function carregarDadosUsuario(userId) {
     try {
-        // PRIMEIRO: Tenta endpoint /api/dashboard
-        let dados = null;
-        
-        try {
-            const respostaDashboard = await fetch(`https://ciclone-62mq.onrender.com/api/dashboard/${user.id}`);
-            if (respostaDashboard.ok) {
-                dados = await respostaDashboard.json();
-                console.log('Dashboard API response:', dados);
-            }
-        } catch (dashboardError) {
-            console.log('Dashboard endpoint falhou, tentando login...');
+      // Busca dados do usuário na tabela usuarios
+      const { data: usuario, error } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (usuario) {
+        // Atualiza interface
+        document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${usuario.nome}!`;
+        document.getElementById('saldoTotal').textContent = `R$ ${parseFloat(usuario.saldo_redisponivel || 0).toFixed(4)}`;
+        document.getElementById('userId').textContent = usuario.id;
+        document.getElementById('userNome').textContent = usuario.nome;
+        document.getElementById('userEmail').textContent = usuario.email;
+        document.getElementById('userTelefone').textContent = usuario.telefone || 'Não informado';
+        document.getElementById('userPix').textContent = usuario.chavepix || 'Não cadastrada';
+        document.getElementById('recebendoCreditos').textContent = usuario.recebendo_creditos ? 'Sim ✅' : 'Não ❌';
+        document.getElementById('limiteAtingido').textContent = usuario.limite_atingido ? 'Sim ⚠️' : 'Não ✅';
+        document.getElementById('statusConta').textContent = usuario.recebendo_creditos ? 'PRO' : 'FREE';
+
+        // Data de cadastro
+        if (usuario.created_at) {
+          const data = new Date(usuario.created_at);
+          document.getElementById('userCadastro').textContent = data.toLocaleDateString('pt-BR');
         }
-        
-        // SEGUNDO: Se dashboard falhou, usa endpoint de login
-        if (!dados || !dados.success) {
-            const respostaLogin = await fetch('https://ciclone-62mq.onrender.com/api/login-completo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    email: user.email, 
-                    senha: user.senha 
-                })
-            });
-            
-            dados = await respostaLogin.json();
-            console.log('Login API response:', dados);
-            
-            if (dados.success) {
-                // Reestrutura para formato compatível
-                dados = {
-                    success: true,
-                    user: dados.user,
-                    clicks: dados.user.clicks || { total_clicks: 0, clicks_hoje: 0, data_ultimo_click: null }
-                };
-            }
-        }
-        
-        if (dados.success) {
-            const userData = dados.user;
-            const clicksData = dados.clicks || {};
-            
-            // ✅ CORREÇÃO: Formata saldo com 4 casas decimais
-            const saldo = parseFloat(userData.saldo_redisponivel || 0);
-            const saldoFormatado = saldo.toFixed(4);
-            
-            // ATUALIZA LOCALSTORAGE
-            localStorage.setItem('user', JSON.stringify({
-                ...user,
-                ...userData,
-                clicks: clicksData
-            }));
-            
-            // PREENCHE DADOS DO USUÁRIO
-            document.getElementById('saldoInfo').innerHTML = `Saldo Disponível: R$ ${saldoFormatado}`;
-            document.getElementById('userId').textContent = userData.id || '-';
-            document.getElementById('userEmail').textContent = userData.email || '-';
-            document.getElementById('userNome').textContent = userData.nome || 'Não informado';
-            document.getElementById('userPix').textContent = userData.chavepix || 'Não cadastrada';
-            document.getElementById('userTelefone').textContent = userData.telefone || 'Não cadastrado';
-            
-            if (userData.data_criacao) {
-                const data = new Date(userData.data_criacao);
-                document.getElementById('userDataCadastro').textContent = data.toLocaleDateString();
-            } else {
-                document.getElementById('userDataCadastro').textContent = '-';
-            }
-            
-            // PREENCHE SISTEMA DE CRÉDITOS
-            document.getElementById('recebendoCreditos').textContent = userData.recebendo_creditos ? 'Sim ✅' : 'Não ❌';
-            document.getElementById('limiteAtingido').textContent = userData.limite_atingido ? 'Sim ⚠️' : 'Não ✅';
-            document.getElementById('saldoRetirada').textContent = `R$ ${saldoFormatado}`;
-            
-            // PREENCHE ESTATÍSTICAS DE CLICKS
-            document.getElementById('totalClicks').textContent = clicksData.total_clicks || 0;
-            document.getElementById('clicksHoje').textContent = clicksData.clicks_hoje || 0;
-            
-            if (clicksData.data_ultimo_click) {
-                const data = new Date(clicksData.data_ultimo_click);
-                document.getElementById('ultimoClick').textContent = data.toLocaleString();
-            } else {
-                document.getElementById('ultimoClick').textContent = 'Nunca';
-            }
-            
-            console.log('✅ Dashboard carregado. Saldo:', saldoFormatado);
-            
-        } else {
-            alert('Erro: ' + (dados.error || 'Não foi possível carregar dados'));
-        }
-        
-    } catch (erro) {
-        console.error('Erro ao carregar dados:', erro);
-        
-        // FALLBACK: Usa dados do localStorage
-        const saldo = parseFloat(user.saldo_redisponivel || 0).toFixed(4);
-        document.getElementById('saldoInfo').innerHTML = `Saldo Disponível: R$ ${saldo}`;
-        document.getElementById('saldoRetirada').textContent = `R$ ${saldo}`;
-        document.getElementById('userEmail').textContent = user.email || '-';
-        document.getElementById('userNome').textContent = user.nome || 'Não informado';
-        
-        alert('⚠️ Usando dados locais. Atualize a página para sincronizar.');
+
+        // Atualiza localStorage com dados mais recentes
+        localStorage.setItem('user', JSON.stringify({
+          ...JSON.parse(localStorage.getItem('user') || '{}'),
+          ...usuario
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
+      alert('Erro ao carregar dados. Verifique sua conexão.');
     }
-}
+  }
 
-function irParaAnuncios() {
-    window.location.href = 'viewads-botton.html';
-}
+  async function carregarEstatisticasCliques(userId) {
+    try {
+      // Busca cliques do usuário
+      const { data: cliques, error } = await supabase
+        .from('clicks')
+        .select('*')
+        .eq('usuario_id', userId);
 
-function sacarDinheiro() {
-    window.location.href = '#';
-    alert('Para saques whatsapp 5521999102951');
-}
+      if (error) throw error;
 
-function fazerUpgrade() {
-    window.location.href = '#';
-    alert('Para fazer upgrade whatsapp 5521 99910 2951');
-}
+      // Calcula estatísticas
+      const totalClicks = cliques?.length || 0;
+      
+      // Cliques hoje
+      const hoje = new Date().toISOString().split('T')[0];
+      const clicksHoje = cliques?.filter(c => 
+        c.created_at && c.created_at.split('T')[0] === hoje
+      ).length || 0;
 
-function logout() {
+      // Último clique
+      let ultimoClick = 'Nunca';
+      if (cliques && cliques.length > 0) {
+        const ultimo = cliques.sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        )[0];
+        ultimoClick = new Date(ultimo.created_at).toLocaleString('pt-BR');
+      }
+
+      // Média por dia (aprox)
+      const primeiroClique = cliques && cliques.length > 0 ? 
+        new Date(cliques.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0].created_at) : 
+        new Date();
+      const diasDesdePrimeiro = Math.max(1, Math.floor((new Date() - primeiroClique) / (1000 * 60 * 60 * 24)));
+      const mediaDia = Math.round(totalClicks / diasDesdePrimeiro);
+
+      // Atualiza interface
+      document.getElementById('totalClicks').textContent = totalClicks;
+      document.getElementById('clicksHoje').textContent = clicksHoje;
+      document.getElementById('ultimoClick').textContent = ultimoClick;
+      document.getElementById('mediaDia').textContent = `${mediaDia}/dia`;
+
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+    }
+  }
+
+  function sacarDinheiro() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.chavepix) {
+      alert('Cadastre uma chave PIX na sua conta primeiro!');
+      return;
+    }
+    
+    const saldo = parseFloat(user.saldo_redisponivel || 0);
+    if (saldo < 10) {
+      alert(`Saldo insuficiente para saque!\nNecessário: R$ 10,00\nSeu saldo: R$ ${saldo.toFixed(4)}`);
+      return;
+    }
+    
+    alert('Para solicitar saque, entre em contato pelo WhatsApp: 21 99910-2951');
+  }
+
+  function fazerUpgrade() {
+    alert('Para fazer upgrade para conta PRO (R$ 15,00), entre em contato pelo WhatsApp: 21 99910-2951');
+  }
+
+  function logout() {
     localStorage.removeItem('user');
     window.location.href = 'index.html';
-}
+  }
+
+  // Fechar menu ao clicar fora
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menu');
+    const btn = document.querySelector('.menu-btn');
+    if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    }
+  });
 </script>
+
+<!-- Incluir biblioteca do Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
