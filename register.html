@@ -3,42 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar - CICLONE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>CICLONE - Registrar</title>
 <style>
-    body { background: #e8edf2; margin: 0; font-family: Arial, sans-serif; }
-    .register-box { width: 340px; margin: 60px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
-    h2 { text-align: center; margin-bottom: 25px; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #b8c2cc; border-radius: 5px; font-size: 15px; }
-    button { width: 100%; background: #198754; color: white; padding: 12px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
-    button:hover { background: #157347; }
-    .link { text-align: center; margin-top: 12px; font-size: 14px; }
-    .link a { color: #0d6efd; text-decoration: none; font-weight: bold; }
+  body {
+    background: #000;
+    color: gold;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: #222;
+    color: #ffd54a;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transition: background 0.2s;
+  }
+  .menu-btn:hover { background: #333; }
+
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    overflow-y: auto;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+  }
+  .side-menu.open { transform: translateX(0); }
+
+  .side-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 15px;
+    transition: background 0.2s;
+    border-bottom: 1px solid #222;
+  }
+  .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+  .side-menu i {
+    width: 24px;
+    margin-right: 12px;
+    text-align: center;
+    color: gold;
+  }
+
+  main {
+    padding: 20px;
+    margin-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .register-box {
+    width: 340px;
+    background: #111;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255,215,0,0.2);
+    border: 1px solid #333;
+  }
+
+  .register-box h2 {
+    color: gold;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 22px;
+  }
+
+  .register-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    font-size: 15px;
+    background: #222;
+    color: white;
+    box-sizing: border-box;
+  }
+
+  .register-box button {
+    width: 100%;
+    background: #198754;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+  }
+
+  .register-box button:hover { background: #157347; }
+
+  .link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #aaa;
+  }
+
+  .link a {
+    color: gold;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .link a:hover { text-decoration: underline; }
+
+  .info {
+    color: #0d6efd;
+    font-size: 13px;
+    margin: 10px 0;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  #zap-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #25D366;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+  }
+
+  #zap-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+  }
+
+  #zap-box img {
+    width: 30px;
+  }
+
+  .loading {
+    display: none;
+    text-align: center;
+    color: gold;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
 
-<div class="register-box">
-    <h2>Criar Conta CICLONE</h2>
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
 
-    <input type="text" id="nome" placeholder="Seu nome">
-    <input type="email" id="email" placeholder="Seu e-mail">
-    <input type="password" id="senha" placeholder="Crie uma senha">
-    <input type="text" id="chavepix" placeholder="Sua chave PIX">
-    <input type="text" id="telefone" placeholder="Seu telefone">
-    <input type="text" id="avatar" placeholder="URL do seu avatar">
+<nav class="side-menu" id="menu">
+  <a href="#"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="#"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
+  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
+  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+  <a href="#"><i class="fas fa-credit-card"></i> Cartão</a>
+  <a href="#"><i class="fas fa-file-invoice-dollar"></i> Extrato</a>
+  <a href="#"><i class="fas fa-home"></i> Home</a>
+</nav>
 
-    <button onclick="fazerRegistro()">Registrar</button>
+<main>
+  <div class="register-box">
+    <h2><i class="fas fa-user-plus"></i> Criar Conta CICLONE</h2>
+
+    <input type="text" id="nome" placeholder="Seu nome completo" required>
+    <input type="email" id="email" placeholder="Seu e-mail válido" required>
+    <input type="password" id="senha" placeholder="Crie uma senha forte" required>
+    <input type="text" id="chavepix" placeholder="Chave PIX (CPF, email ou telefone)">
+    <input type="text" id="telefone" placeholder="Telefone com DDD">
+    <input type="text" id="avatar" placeholder="URL do avatar (opcional)">
+
+    <button onclick="fazerRegistro()">
+      <i class="fas fa-user-check"></i> Registrar Agora
+    </button>
+
+    <div class="loading" id="loading">
+      <i class="fas fa-spinner fa-spin"></i> Cadastrando...
+    </div>
 
     <div class="link">
-        Já possui conta? <a href="login-top.html">Login</a>
+      Já possui conta? <a href="login-top.html">Faça Login</a>
     </div>
     
-    <p>Ganhe R$ 1.000,00 ou mais</p>
-    <p>R$ 0,0001 por click direto no PIX</p>
-</div>
+    <div class="info">
+      <i class="fas fa-gift"></i> Ganhe R$ 1.000,00 ou mais
+    </div>
+    <div class="info">
+      <i class="fas fa-mouse-pointer"></i> R$ 0,0001 por click direto no PIX
+    </div>
+  </div>
+</main>
+
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+  Atendimento
+</a>
 
 <script>
-async function fazerRegistro() {
+  // CREDENCIAIS DO SUPABASE (SUAS)
+  const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+  // Criar cliente Supabase
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+  }
+
+  async function fazerRegistro() {
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value.trim();
@@ -46,51 +248,79 @@ async function fazerRegistro() {
     const telefone = document.getElementById('telefone').value.trim();
     const avatar = document.getElementById('avatar').value.trim();
 
+    // Validação básica
     if (!nome || !email || !senha) {
-        alert('Preencha pelo menos nome, email e senha!');
-        return;
+      alert('Por favor, preencha pelo menos Nome, Email e Senha!');
+      return;
     }
+
+    if (senha.length < 6) {
+      alert('A senha deve ter no mínimo 6 caracteres!');
+      return;
+    }
+
+    // Mostrar loading
+    document.getElementById('loading').style.display = 'block';
 
     try {
-        // ✅ URL CORRIGIDA - usando SEU backend real
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/cadastro', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ 
-                nome, 
-                email, 
-                senha, 
-                chavepix: chavepix || null, 
-                telefone: telefone || null, 
-                avatar: avatar || null,
-                recebendo_creditos: false,
-                limite_atingido: false,
-                saldo_redisponivel: 0.00
-            })
-        });
+      // INSERIR NO SUPABASE (tabela 'usuarios')
+      const { data, error } = await supabase
+        .from('usuarios')
+        .insert([
+          {
+            nome: nome,
+            email: email,
+            senha: senha, // EM PRODUÇÃO: CRIPTOGRAFAR!
+            chavepix: chavepix || null,
+            telefone: telefone || null,
+            avatar: avatar || null,
+            recebendo_creditos: false,
+            limite_atingido: false,
+            saldo_redisponivel: 0.0000
+          }
+        ])
+        .select();
 
-        // ✅ Verifica se a resposta HTTP é OK
-        if (!resposta.ok) {
-            throw new Error(`Erro do servidor: ${resposta.status}`);
-        }
+      // Esconder loading
+      document.getElementById('loading').style.display = 'none';
 
-        const dados = await resposta.json();
-
-        if (dados.success) {
-            alert('Conta criada com sucesso!');
-            window.location.href = 'login-top.html';
+      if (error) {
+        if (error.code === '23505') {
+          alert('ERRO: Este email já está cadastrado!');
         } else {
-            alert('Erro: ' + (dados.error || 'Erro desconhecido'));
+          throw error;
         }
+        return;
+      }
+
+      // Sucesso
+      if (data && data.length > 0) {
+        alert(`✅ Cadastro realizado com sucesso!\nSeu ID: ${data[0].id}`);
+        // Redirecionar para login
+        window.location.href = 'login-top.html';
+      } else {
+        alert('Cadastro realizado, mas não retornou dados de confirmação.');
+      }
+
     } catch (erro) {
-        console.error('Erro completo:', erro);
-        alert('Erro de conexão: ' + erro.message);
+      document.getElementById('loading').style.display = 'none';
+      console.error('Erro no cadastro:', erro);
+      alert(`Erro ao cadastrar: ${erro.message || 'Verifique sua conexão'}`);
     }
-}
+  }
+
+  // Fechar menu ao clicar fora (opcional)
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menu');
+    const btn = document.querySelector('.menu-btn');
+    if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    }
+  });
 </script>
+
+<!-- Incluir biblioteca do Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
