@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ciclone
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: DATABASE_URL
+        value: "postgresql://neondb_owner:npg_UFGAytfcx18I@ep-withered-field-a4765qib.us-east-1.aws.neon.tech/neondb?sslmode=require"
