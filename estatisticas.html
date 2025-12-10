@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CICLONE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>CICLONE - Estatísticas</title>
 <style>
     * {
         margin: 0;
@@ -19,6 +20,62 @@
         padding: 20px;
     }
 
+    /* MENU RETRÁTIL */
+    .menu-btn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background: #222;
+        color: #ffd54a;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 18px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        transition: background 0.2s;
+    }
+    .menu-btn:hover { background: #333; }
+
+    .side-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 230px;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        overflow-y: auto;
+        transform: translateX(-250px);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        padding-top: 60px;
+        box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+    }
+    .side-menu.open { transform: translateX(0); }
+
+    .side-menu a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #fff;
+        padding: 12px 15px;
+        transition: background 0.2s;
+        border-bottom: 1px solid #222;
+    }
+    .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+    .side-menu i {
+        width: 24px;
+        margin-right: 12px;
+        text-align: center;
+        color: gold;
+    }
+
+    main {
+        margin-top: 20px;
+    }
+
     .topo {
         display: flex;
         align-items: center;
@@ -27,6 +84,7 @@
         background: rgba(255, 255, 255, 0.05);
         padding: 20px;
         border-radius: 10px;
+        margin-top: 40px;
     }
 
     .texto {
@@ -102,48 +160,197 @@
         text-decoration: none;
         margin: 0 10px;
     }
+
+    /* ZAP BOX */
+    #zap-box {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        background-color: #25D366;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none !important;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+        transition: 0.2s ease;
+    }
+
+    #zap-box:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+    }
+
+    #zap-box img {
+        width: 30px;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 768px) {
+        .estatisticas {
+            grid-template-columns: 1fr;
+        }
+        
+        .topo {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .item {
+            grid-column: span 1 !important;
+        }
+    }
 </style>
 </head>
 <body>
 
-<div class="topo">
-    <div class="texto">
-        <h2>PTC CICLONE</h2>
-        <p>Ganha para ver anúncios. Pagamento na conta pix.</p>
-        <p>Quem mais clicar ganha primeiro ! </p>
-    </div>
-    
-    <div class="imagem">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Logo">
-    </div>
-</div>
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
 
-<div class="estatisticas" id="estatisticas">
-    <!-- Dados serão carregados aqui -->
-</div>
+<nav class="side-menu" id="menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
+  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
+  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+</nav>
 
-<div class="rodape">
-    <p>
-        <a href="index.html">Início</a> | 
-        <a href="login-top.html">Login</a> | 
-        <a href="register.html">Registrar</a>
-    </p>
-</div>
+<main>
+    <div class="topo">
+        <div class="texto">
+            <h2><i class="fas fa-chart-bar"></i> ESTATÍSTICAS CICLONE</h2>
+            <p>Dados em tempo real do sistema PTC</p>
+            <p>Atualizado automaticamente a cada 30 segundos</p>
+        </div>
+        
+        <div class="imagem">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Logo">
+        </div>
+    </div>
+
+    <div class="estatisticas" id="estatisticas">
+        <!-- Dados serão carregados aqui -->
+        <div class="item">
+            <div class="nome">CARREGANDO DADOS</div>
+            <div class="valor"><i class="fas fa-spinner fa-spin"></i></div>
+            <div class="fonte">Conectando ao banco de dados...</div>
+        </div>
+    </div>
+
+    <div class="rodape">
+        <p>
+            <a href="index.html">Início</a> | 
+            <a href="dashboard.html">Painel</a> | 
+            <a href="login-top.html">Login</a> | 
+            <a href="register.html">Registrar</a>
+        </p>
+        <p style="margin-top: 10px; color: #666;">
+            <i class="fas fa-sync-alt"></i> Atualiza automaticamente | 
+            <i class="fas fa-database"></i> Dados do Supabase
+        </p>
+    </div>
+</main>
+
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+    Atendimento
+</a>
 
 <script>
-// Busca dados REAIS das tabelas
+// CREDENCIAIS SUPABASE
+const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+// Cliente Supabase
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+}
+
+// Fechar menu ao clicar fora
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menu');
+    const btn = document.querySelector('.menu-btn');
+    if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+        menu.classList.remove('open');
+    }
+});
+
+// Busca dados REAIS das tabelas do SUPABASE
 async function buscarEstatisticas() {
     try {
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/estatisticas');
-        const dados = await resposta.json();
-        
-        if (dados.success) {
-            mostrarDados(dados);
-        } else {
-            mostrarDadosZerados();
+        // Busca todas as estatísticas em paralelo
+        const [
+            { data: usuarios, error: err1 },
+            { data: clicks, error: err2 },
+            { data: anuncios, error: err3 }
+        ] = await Promise.all([
+            supabase.from('usuarios').select('id, nome'),
+            supabase.from('clicks').select('id, usuario_id, created_at'),
+            supabase.from('anuncios').select('id, ativo')
+        ]);
+
+        if (err1 || err2 || err3) {
+            throw new Error('Erro ao buscar dados do Supabase');
         }
+
+        // Processa dados
+        const totalUsuarios = usuarios?.length || 0;
+        const totalClicks = clicks?.length || 0;
+        const totalAnuncios = anuncios?.length || 0;
+        const anunciosAtivos = anuncios?.filter(a => a.ativo)?.length || 0;
+
+        // Encontra usuário com mais cliques
+        let maisClicks = { nome: 'Nenhum', total_clicks: 0 };
+        if (clicks && clicks.length > 0) {
+            const clicksPorUsuario = {};
+            clicks.forEach(click => {
+                clicksPorUsuario[click.usuario_id] = (clicksPorUsuario[click.usuario_id] || 0) + 1;
+            });
+            
+            const usuarioIdMaisClicks = Object.keys(clicksPorUsuario).reduce((a, b) => 
+                clicksPorUsuario[a] > clicksPorUsuario[b] ? a : b
+            );
+            
+            const usuarioMais = usuarios?.find(u => u.id == usuarioIdMaisClicks);
+            if (usuarioMais) {
+                maisClicks = {
+                    nome: usuarioMais.nome,
+                    total_clicks: clicksPorUsuario[usuarioIdMaisClicks]
+                };
+            }
+        }
+
+        // Cálculo de cliques hoje
+        const hoje = new Date().toISOString().split('T')[0];
+        const clicksHoje = clicks?.filter(c => 
+            c.created_at && c.created_at.split('T')[0] === hoje
+        ).length || 0;
+
+        // Monta objeto de dados
+        const dados = {
+            success: true,
+            total_usuarios: totalUsuarios,
+            total_clicks: totalClicks,
+            total_anuncios: totalAnuncios,
+            anuncios_ativos: anunciosAtivos,
+            clicks_hoje: clicksHoje,
+            mais_clicks: maisClicks
+        };
+
+        mostrarDados(dados);
+
     } catch (erro) {
-        console.error('Erro:', erro);
+        console.error('Erro ao buscar estatísticas:', erro);
         mostrarDadosZerados();
     }
 }
@@ -161,7 +368,7 @@ function mostrarDados(dados) {
         <div class="item">
             <div class="nome">USUÁRIOS CADASTRADOS</div>
             <div class="valor">${formatarNumero(dados.total_usuarios)}</div>
-            <div class="fonte">tabela cadastro</div>
+            <div class="fonte">tabela usuarios</div>
         </div>
         
         <div class="item">
@@ -173,17 +380,25 @@ function mostrarDados(dados) {
         <div class="item">
             <div class="nome">TOTAL DE ANÚNCIOS</div>
             <div class="valor">${formatarNumero(dados.total_anuncios)}</div>
-            <div class="fonte">tabela anuncios (sem filtro)</div>
+            <div class="fonte">tabela anuncios</div>
         </div>
         
+        <div class="item">
+            <div class="nome">ANÚNCIOS ATIVOS</div>
+            <div class="valor">${formatarNumero(dados.anuncios_ativos)}</div>
+            <div class="fonte">anuncios ativos hoje</div>
+        </div>
         
-        
-        
+        <div class="item">
+            <div class="nome">CLICKS HOJE</div>
+            <div class="valor">${formatarNumero(dados.clicks_hoje)}</div>
+            <div class="fonte">registrados hoje</div>
+        </div>
         
         <div class="item" style="grid-column: span 2;">
             <div class="nome">USUÁRIO COM MAIS CLICKS</div>
             <div class="valor">${dados.mais_clicks.nome || 'Nenhum'} - ${formatarNumero(dados.mais_clicks.total_clicks)} clicks</div>
-            <div class="fonte">maior total_clicks na tabela clicks</div>
+            <div class="fonte">maior total na tabela clicks</div>
         </div>
     `;
 }
@@ -196,7 +411,7 @@ function mostrarDadosZerados() {
         <div class="item">
             <div class="nome">USUÁRIOS CADASTRADOS</div>
             <div class="valor">0</div>
-            <div class="fonte">tabela cadastro</div>
+            <div class="fonte">tabela usuarios</div>
         </div>
         
         <div class="item">
@@ -208,25 +423,40 @@ function mostrarDadosZerados() {
         <div class="item">
             <div class="nome">TOTAL DE ANÚNCIOS</div>
             <div class="valor">0</div>
-            <div class="fonte">tabela anuncios (sem filtro)</div>
+            <div class="fonte">tabela anuncios</div>
         </div>
         
+        <div class="item">
+            <div class="nome">ANÚNCIOS ATIVOS</div>
+            <div class="valor">0</div>
+            <div class="fonte">anuncios ativos hoje</div>
+        </div>
         
+        <div class="item">
+            <div class="nome">CLICKS HOJE</div>
+            <div class="valor">0</div>
+            <div class="fonte">registrados hoje</div>
+        </div>
 
         <div class="item" style="grid-column: span 2;">
             <div class="nome">USUÁRIO COM MAIS CLICKS</div>
             <div class="valor">Nenhum</div>
-            <div class="fonte">maior total_clicks na tabela clicks</div>
+            <div class="fonte">maior total na tabela clicks</div>
         </div>
     `;
 }
 
 // Carrega ao abrir
-buscarEstatisticas();
+window.addEventListener('DOMContentLoaded', () => {
+    buscarEstatisticas();
+});
 
 // Atualiza a cada 30 segundos
 setInterval(buscarEstatisticas, 30000);
 </script>
+
+<!-- Incluir biblioteca do Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
