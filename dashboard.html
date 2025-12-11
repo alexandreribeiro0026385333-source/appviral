@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>CICLONE - Dashboard</title>
+<style>
+  body {
+    background: #000;
+    color: gold;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: #222;
+    color: #ffd54a;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transition: background 0.2s;
+  }
+  .menu-btn:hover { background: #333; }
+
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    overflow-y: auto;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+  }
+  .side-menu.open { transform: translateX(0); }
+
+  .side-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 15px;
+    transition: background 0.2s;
+    border-bottom: 1px solid #222;
+  }
+  .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+  .side-menu i {
+    width: 24px;
+    margin-right: 12px;
+    text-align: center;
+    color: gold;
+  }
+
+  main {
+    padding: 20px;
+    margin-top: 60px;
+    min-height: 100vh;
+  }
+
+  .header-dash {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .saldo-box {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .info-card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+  }
+
+  .info-card h3 {
+    color: gold;
+    margin-top: 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+  }
+
+  .info-item:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #aaa;
+  }
+
+  .info-value {
+    color: white;
+    font-weight: bold;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .action-btn {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    text-align: center;
+  }
+
+  .action-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-3px);
+  }
+
+  .action-btn.green { background: #198754; }
+  .action-btn.green:hover { background: #157347; }
+  .action-btn.orange { background: #fd7e14; }
+  .action-btn.orange:hover { background: #e8590c; }
+  .action-btn.red { background: #dc3545; }
+  .action-btn.red:hover { background: #c82333; }
+
+  .stats-box {
+    background: rgba(255,215,0,0.05);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 30px;
+    color: gold;
+  }
+
+  #zap-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #25D366;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+  }
+
+  #zap-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+  }
+
+  #zap-box img {
+    width: 30px;
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+
+<nav class="side-menu" id="menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
+</nav>
+
+<main>
+  <div class="header-dash">
+    <h1><i class="fas fa-tachometer-alt"></i> Painel CICLONE</h1>
+    <p id="welcomeMessage">Carregando dados...</p>
+  </div>
+
+  <div class="saldo-box">
+    <div><i class="fas fa-wallet"></i> Saldo Disponível</div>
+    <div id="saldoTotal">R$ 0,0000</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3><i class="fas fa-user"></i> Dados Pessoais</h3>
+      <div class="info-item">
+        <span class="info-label">ID:</span>
+        <span class="info-value" id="userId">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Nome:</span>
+        <span class="info-value" id="userNome">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Email:</span>
+        <span class="info-value" id="userEmail">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Telefone:</span>
+        <span class="info-value" id="userTelefone">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Cadastro:</span>
+        <span class="info-value" id="userCadastro">-</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3><i class="fas fa-chart-bar"></i> Estatísticas de Cliques</h3>
+      <div class="info-item">
+        <span class="info-label">Total de Cliques:</span>
+        <span class="info-value" id="totalClicks">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Cliques Hoje:</span>
+        <span class="info-value" id="clicksHoje">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Último Clique:</span>
+        <span class="info-value" id="ultimoClick">Nunca</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Média por Dia:</span>
+        <span class="info-value" id="mediaDia">0</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3><i class="fas fa-cogs"></i> Configurações da Conta</h3>
+      <div class="info-item">
+        <span class="info-label">Status:</span>
+        <span class="info-value" id="statusConta">Free</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Recebendo Créditos:</span>
+        <span class="info-value" id="recebendoCreditos">Não</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Limite Atingido:</span>
+        <span class="info-value" id="limiteAtingido">Não</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Chave PIX:</span>
+        <span class="info-value" id="userPix">Não cadastrada</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-grid">
+    <button class="action-btn green" onclick="window.location.href='viewads-botton.html'">
+      <i class="fas fa-ad"></i> Ver Anúncios
+    </button>
+    <button class="action-btn" onclick="sacarDinheiro()">
+      <i class="fas fa-money-bill-wave"></i> Sacar PIX
+    </button>
+    <button class="action-btn orange" onclick="fazerUpgrade()">
+      <i class="fas fa-rocket"></i> Fazer Upgrade
+    </button>
+    <button class="action-btn red" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+  </div>
+
+  <div class="stats-box">
+    <h3><i class="fas fa-info-circle"></i> Informações do Sistema</h3>
+    <p>• Valor por clique: R$ 0,0001</p>
+    <p>• Saque mínimo: R$ 10,00</p>
+    <p>• Conta Free não recebe pagamentos</p>
+    <p>• Upgrade para PRO: R$ 15,00 (whatsapp 21 99910-2951)</p>
+  </div>
+</main>
+
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+  Atendimento
+</a>
+
+<script>
+  // CREDENCIAIS SUPABASE
+  const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+  }
+
+  // Carrega quando a página estiver pronta
+  document.addEventListener('DOMContentLoaded', function() {
+    // Carrega a biblioteca do Supabase primeiro
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+    script.onload = function() {
+      console.log('✅ Supabase carregado, iniciando dashboard...');
+      carregarDashboard();
+    };
+    script.onerror = function() {
+      console.error('❌ Erro ao carregar Supabase');
+      document.getElementById('welcomeMessage').textContent = 'Erro de conexão';
+    };
+    document.head.appendChild(script);
+  });
+
+  async function carregarDashboard() {
+    try {
+      // Verifica se usuário está logado
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+      }
+
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      // 1. Busca dados do usuário
+      const { data: usuario, error: userError } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) {
+        console.error('Erro ao buscar usuário:', userError);
+        throw userError;
+      }
+
+      // Atualiza interface com dados do usuário
+      if (usuario) {
+        document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${usuario.nome}!`;
+        document.getElementById('saldoTotal').textContent = `R$ ${parseFloat(usuario.saldo_redisponivel || 0).toFixed(4)}`;
+        document.getElementById('userId').textContent = usuario.id;
+        document.getElementById('userNome').textContent = usuario.nome;
+        document.getElementById('userEmail').textContent = usuario.email;
+        document.getElementById('userTelefone').textContent = usuario.telefone || 'Não informado';
+        document.getElementById('userPix').textContent = usuario.chavepix || 'Não cadastrada';
+        document.getElementById('recebendoCreditos').textContent = usuario.recebendo_creditos ? 'Sim ✅' : 'Não ❌';
+        document.getElementById('limiteAtingido').textContent = usuario.limite_atingido ? 'Sim ⚠️' : 'Não ✅';
+        document.getElementById('statusConta').textContent = usuario.recebendo_creditos ? 'PRO' : 'FREE';
+
+        // Data de cadastro
+        if (usuario.created_at) {
+          const data = new Date(usuario.created_at);
+          document.getElementById('userCadastro').textContent = data.toLocaleDateString('pt-BR');
+        }
+
+        // Atualiza localStorage
+        localStorage.setItem('user', JSON.stringify({
+          ...user,
+          ...usuario
+        }));
+      }
+
+      // 2. Busca cliques do usuário
+      const { data: cliques, error: clicksError } = await supabase
+        .from('clicks')
+        .select('*')
+        .eq('usuario_id', user.id);
+
+      if (clicksError) {
+        console.error('Erro ao buscar cliques:', clicksError);
+        // Continua mesmo sem cliques
+      }
+
+      // Calcula estatísticas
+      const totalClicks = cliques?.length || 0;
+      
+      // Cliques hoje
+      const hoje = new Date().toISOString().split('T')[0];
+      const clicksHoje = cliques?.filter(c => 
+        c.created_at && c.created_at.split('T')[0] === hoje
+      ).length || 0;
+
+      // Último clique
+      let ultimoClick = 'Nunca';
+      if (cliques && cliques.length > 0) {
+        const ultimo = cliques.sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        )[0];
+        ultimoClick = new Date(ultimo.created_at).toLocaleString('pt-BR');
+      }
+
+      // Média por dia
+      let mediaDia = 0;
+      if (cliques && cliques.length > 0) {
+        const primeiroClique = new Date(cliques.sort((a, b) => 
+          new Date(a.created_at) - new Date(b.created_at)
+        )[0].created_at);
+        const diasDesdePrimeiro = Math.max(1, Math.floor((new Date() - primeiroClique) / (1000 * 60 * 60 * 24)));
+        mediaDia = Math.round(totalClicks / diasDesdePrimeiro);
+      }
+
+      // Atualiza estatísticas
+      document.getElementById('totalClicks').textContent = totalClicks;
+      document.getElementById('clicksHoje').textContent = clicksHoje;
+      document.getElementById('ultimoClick').textContent = ultimoClick;
+      document.getElementById('mediaDia').textContent = `${mediaDia}/dia`;
+
+      console.log('✅ Dashboard carregado com sucesso!');
+
+    } catch (error) {
+      console.error('❌ Erro ao carregar dashboard:', error);
+      document.getElementById('welcomeMessage').textContent = 'Erro ao carregar dados';
+      document.getElementById('saldoTotal').textContent = 'R$ 0,0000';
+    }
+  }
+
+  function sacarDinheiro() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.chavepix) {
+      alert('Cadastre uma chave PIX na sua conta primeiro!');
+      return;
+    }
+    
+    const saldo = parseFloat(user.saldo_redisponivel || 0);
+    if (saldo < 10) {
+      alert(`Saldo insuficiente para saque!\nNecessário: R$ 10,00\nSeu saldo: R$ ${saldo.toFixed(4)}`);
+      return;
+    }
+    
+    alert('Para solicitar saque, entre em contato pelo WhatsApp: 21 99910-2951');
+  }
+
+  function fazerUpgrade() {
+    alert('Para fazer upgrade para conta PRO (R$ 15,00), entre em contato pelo WhatsApp: 21 99910-2951');
+  }
+
+  function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
+
+  // Fechar menu ao clicar fora
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menu');
+    const btn = document.querySelector('.menu-btn');
+    if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>
