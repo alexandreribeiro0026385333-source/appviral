@@ -218,9 +218,9 @@
   <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
   <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
   <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
-  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
-  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
 </nav>
 
 <main>
@@ -269,9 +269,6 @@
 const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-// Cliente Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
 }
@@ -288,6 +285,9 @@ document.addEventListener('click', function(event) {
 // Busca dados REAIS das tabelas do SUPABASE
 async function buscarEstatisticas() {
     try {
+        // CRIAR CLIENTE SUPABASE DENTRO DA FUNÇÃO
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
         // Busca todas as estatísticas em paralelo
         const [
             { data: usuarios, error: err1 },
@@ -299,9 +299,9 @@ async function buscarEstatisticas() {
             supabase.from('anuncios').select('id, ativo')
         ]);
 
-        if (err1 || err2 || err3) {
-            throw new Error('Erro ao buscar dados do Supabase');
-        }
+        if (err1) throw new Error('Erro ao buscar usuários: ' + err1.message);
+        if (err2) throw new Error('Erro ao buscar cliques: ' + err2.message);
+        if (err3) throw new Error('Erro ao buscar anúncios: ' + err3.message);
 
         // Processa dados
         const totalUsuarios = usuarios?.length || 0;
@@ -311,22 +311,31 @@ async function buscarEstatisticas() {
 
         // Encontra usuário com mais cliques
         let maisClicks = { nome: 'Nenhum', total_clicks: 0 };
-        if (clicks && clicks.length > 0) {
+        if (clicks && clicks.length > 0 && usuarios && usuarios.length > 0) {
             const clicksPorUsuario = {};
             clicks.forEach(click => {
                 clicksPorUsuario[click.usuario_id] = (clicksPorUsuario[click.usuario_id] || 0) + 1;
             });
             
-            const usuarioIdMaisClicks = Object.keys(clicksPorUsuario).reduce((a, b) => 
-                clicksPorUsuario[a] > clicksPorUsuario[b] ? a : b
-            );
+            // Encontra o ID do usuário com mais cliques
+            let usuarioIdMaisClicks = null;
+            let maxCliques = 0;
             
-            const usuarioMais = usuarios?.find(u => u.id == usuarioIdMaisClicks);
-            if (usuarioMais) {
-                maisClicks = {
-                    nome: usuarioMais.nome,
-                    total_clicks: clicksPorUsuario[usuarioIdMaisClicks]
-                };
+            for (const [userId, total] of Object.entries(clicksPorUsuario)) {
+                if (total > maxCliques) {
+                    maxCliques = total;
+                    usuarioIdMaisClicks = parseInt(userId);
+                }
+            }
+            
+            if (usuarioIdMaisClicks) {
+                const usuarioMais = usuarios.find(u => u.id === usuarioIdMaisClicks);
+                if (usuarioMais) {
+                    maisClicks = {
+                        nome: usuarioMais.nome,
+                        total_clicks: maxCliques
+                    };
+                }
             }
         }
 
@@ -448,15 +457,23 @@ function mostrarDadosZerados() {
 
 // Carrega ao abrir
 window.addEventListener('DOMContentLoaded', () => {
-    buscarEstatisticas();
+    // Carrega biblioteca Supabase primeiro
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+    script.onload = () => {
+        console.log('Supabase carregado, buscando estatísticas...');
+        buscarEstatisticas();
+    };
+    document.head.appendChild(script);
 });
 
 // Atualiza a cada 30 segundos
-setInterval(buscarEstatisticas, 30000);
+setInterval(() => {
+    if (window.supabase) {
+        buscarEstatisticas();
+    }
+}, 30000);
 </script>
-
-<!-- Incluir biblioteca do Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
