@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>CICLONE - Assistir Anúncio</title>
+<style>
+  body {
+    background: #000;
+    color: gold;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .menu-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: #222;
+    color: #ffd54a;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transition: background 0.2s;
+  }
+  .menu-btn:hover { background: #333; }
+
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    overflow-y: auto;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.7);
+  }
+  .side-menu.open { transform: translateX(0); }
+
+  .side-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 15px;
+    transition: background 0.2s;
+    border-bottom: 1px solid #222;
+  }
+  .side-menu a:hover { background: rgba(255,215,0,0.15); }
+
+  .side-menu i {
+    width: 24px;
+    margin-right: 12px;
+    text-align: center;
+    color: gold;
+  }
+
+  main {
+    padding: 20px;
+    margin-top: 60px;
+    min-height: 100vh;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .header-ad {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .user-info-bar {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .back-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .back-btn:hover {
+    background: #5a6268;
+  }
+
+  /* TEMPORIZADOR */
+  .timer-container {
+    margin: 30px 0;
+  }
+
+  .clock {
+    width: 180px;
+    height: 180px;
+    border: 10px solid #0d6efd;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    position: relative;
+    background: rgba(13, 110, 253, 0.1);
+  }
+
+  .hand {
+    width: 4px;
+    height: 80px;
+    background: #dc3545;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform-origin: bottom;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform 1s linear;
+  }
+
+  #timeDisplay {
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    margin: 20px 0;
+  }
+
+  #progressBar {
+    width: 100%;
+    height: 12px;
+    background: #333;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  #progressFill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #198754, #0d6efd);
+    transition: width 1s linear;
+  }
+
+  /* ANÚNCIO */
+  .ad-window {
+    width: 100%;
+    height: 400px;
+    border: 3px solid #0d6efd;
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .ad-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    cursor: pointer;
+  }
+
+  .ad-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0d6efd;
+    margin-bottom: 10px;
+  }
+
+  .ad-desc {
+    font-size: 16px;
+    color: #aaa;
+    max-width: 80%;
+    margin-bottom: 20px;
+  }
+
+  /* BOTÕES */
+  .action-buttons {
+    margin: 30px 0;
+  }
+
+  #confirmBtn {
+    display: none;
+    padding: 15px 40px;
+    background: #198754;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px;
+  }
+
+  #confirmBtn:hover {
+    background: #157347;
+  }
+
+  #skipBtn {
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  #skipBtn:hover {
+    background: #5a6268;
+  }
+
+  .instructions {
+    color: #aaa;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  #zap-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #25D366;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+  }
+
+  #zap-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+  }
+
+  #zap-box img {
+    width: 30px;
+  }
+
+  .loading {
+    color: gold;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+
+<nav class="side-menu" id="menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
+</nav>
+
+<main>
+  <div class="header-ad">
+    <h1><i class="fas fa-play-circle"></i> Assistindo Anúncio</h1>
+    <p>Aguarde o tempo completo para receber seu crédito</p>
+  </div>
+
+  <div class="user-info-bar">
+    <div>
+      <strong>Usuário:</strong> <span id="userName">Carregando...</span> | 
+      <strong>Saldo:</strong> <span id="currentBalance">R$ 0,0000</span>
+    </div>
+    <button class="back-btn" onclick="skipAd()">
+      <i class="fas fa-times"></i> Cancelar
+    </button>
+  </div>
+
+  <!-- ANÚNCIO -->
+  <div class="ad-window">
+    <a id="adLink" class="ad-link" href="#" target="_blank" onclick="openAdInNewTab(event)">
+      <div class="ad-content">
+        <div class="ad-title" id="adTitle">Carregando anúncio...</div>
+        <div class="ad-desc" id="adDesc">Por favor, aguarde</div>
+        <div class="instructions">
+          <i class="fas fa-external-link-alt"></i> Clique para abrir em nova aba
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- TEMPORIZADOR -->
+  <div class="timer-container">
+    <div class="clock">
+      <div class="hand" id="hand"></div>
+    </div>
+    
+    <div id="timeDisplay">30s</div>
+    
+    <div id="progressBar">
+      <div id="progressFill"></div>
+    </div>
+    
+    <div id="timerMessage">Aguarde o término do anúncio...</div>
+  </div>
+
+  <!-- BOTÕES -->
+  <div class="action-buttons">
+    <button id="confirmBtn" onclick="creditUser()">
+      <i class="fas fa-check-circle"></i> RECEBER R$ 0,0001
+    </button>
+    <br>
+    <button id="skipBtn" onclick="skipAd()">
+      <i class="fas fa-arrow-left"></i> Voltar para Anúncios
+    </button>
+  </div>
+
+  <div class="instructions">
+    <p><i class="fas fa-info-circle"></i> Você deve aguardar o tempo completo para receber o crédito.</p>
+    <p>O anúncio será aberto em nova aba quando você clicar na área acima.</p>
+  </div>
+</main>
+
+<a id="zap-box" href="https://wa.me/5521970227546" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+  Atendimento
+</a>
+
+<script>
+  // CREDENCIAIS SUPABASE
+  const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+  // Variáveis globais
+  let duration = 30;
+  let secondsLeft = duration;
+  let timerInterval;
+  let anuncioId = null;
+  let anuncioData = null;
+  let user = null;
+
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+  }
+
+  // Inicialização
+  window.addEventListener('DOMContentLoaded', async () => {
+    await carregarPagina();
+  });
+
+  async function carregarPagina() {
+    try {
+      // Verifica login
+      user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+      }
+
+      // Mostra nome do usuário e saldo
+      document.getElementById('userName').textContent = user.nome || 'Usuário';
+      document.getElementById('currentBalance').textContent = 
+        `R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(4)}`;
+
+      // Pega ID do anúncio da URL - CORREÇÃO AQUI
+      const params = new URLSearchParams(window.location.search);
+      anuncioId = params.get('id');
+      
+      // Converte para número e usa fallback
+      if (anuncioId) {
+        anuncioId = parseInt(anuncioId);
+      }
+      
+      if (!anuncioId || isNaN(anuncioId)) {
+        anuncioId = 1;
+      }
+
+      // Carrega dados do anúncio
+      await loadAdData();
+      
+      // Inicia temporizador
+      startTimer();
+
+    } catch (error) {
+      console.error('Erro ao carregar página:', error);
+      alert('Erro ao carregar. Verifique sua conexão.');
+    }
+  }
+
+  async function loadAdData() {
+    try {
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      // Busca anúncio no Supabase
+      const { data, error } = await supabase
+        .from('anuncios')
+        .select('*')
+        .eq('id', anuncioId)
+        .single();
+
+      if (error) throw error;
+
+      anuncioData = data;
+      
+      // Atualiza interface
+      document.getElementById('adTitle').textContent = data.titulo || 'Anúncio';
+      document.getElementById('adDesc').textContent = data.descricao || 'Visualize este anúncio para ganhar créditos';
+      
+      // Configura link
+      if (data.link_anuncio) {
+        document.getElementById('adLink').href = data.link_anuncio;
+      }
+      
+      // Define tempo se existir
+      if (data.tempo_exibicao) {
+        duration = data.tempo_exibicao;
+        secondsLeft = duration;
+        document.getElementById('timeDisplay').textContent = `${duration}s`;
+      }
+
+    } catch (error) {
+      console.error('Erro ao carregar anúncio:', error);
+      document.getElementById('adTitle').textContent = 'Anúncio não encontrado';
+      document.getElementById('adDesc').textContent = 'Este anúncio pode ter sido removido';
+    }
+  }
+
+  function startTimer() {
+    // Reinicia variáveis
+    secondsLeft = duration;
+    
+    // Atualiza display inicial
+    updateTimerDisplay();
+    
+    // Inicia intervalo
+    timerInterval = setInterval(() => {
+      if (secondsLeft > 0) {
+        secondsLeft--;
+        updateTimerDisplay();
+        
+        // Verifica se terminou
+        if (secondsLeft === 0) {
+          clearInterval(timerInterval);
+          timerFinished();
+        }
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    // Atualiza display numérico
+    document.getElementById('timeDisplay').textContent = `${secondsLeft}s`;
+    
+    // Atualiza ponteiro do relógio (360 graus / duration)
+    const angle = 360 - ((secondsLeft / duration) * 360);
+    document.getElementById('hand').style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    
+    // Atualiza barra de progresso
+    const progress = ((duration - secondsLeft) / duration) * 100;
+    document.getElementById('progressFill').style.width = `${progress}%`;
+    
+    // Atualiza mensagem
+    if (secondsLeft > 0) {
+      document.getElementById('timerMessage').textContent = 
+        `Aguarde ${secondsLeft} segundo${secondsLeft !== 1 ? 's' : ''}...`;
+    }
+  }
+
+  function timerFinished() {
+    document.getElementById('timerMessage').textContent = '✅ Tempo concluído!';
+    document.getElementById('confirmBtn').style.display = 'inline-block';
+    document.getElementById('timeDisplay').style.color = '#198754';
+  }
+
+  function openAdInNewTab(event) {
+    if (anuncioData && anuncioData.link_anuncio) {
+      window.open(anuncioData.link_anuncio, '_blank');
+    }
+    event.preventDefault();
+    return false;
+  }
+
+  async function creditUser() {
+    try {
+      // Desabilita botão para evitar múltiplos cliques
+      document.getElementById('confirmBtn').disabled = true;
+      document.getElementById('confirmBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // 1. REGISTRA CLIQUE NA TABELA clicks
+      const { data: click, error: clickError } = await supabase
+        .from('clicks')
+        .insert([
+          {
+            usuario_id: user.id,
+            anuncio_id: anuncioId,
+            valor_ganho: 0.0001
+          }
+        ])
+        .select()
+        .single();
+
+      if (clickError) throw clickError;
+
+      // 2. ATUALIZA SALDO DO USUÁRIO (soma 0.0001)
+      const { data: usuarioAtual } = await supabase
+        .from('usuarios')
+        .select('saldo_redisponivel')
+        .eq('id', user.id)
+        .single();
+
+      const novoSaldo = parseFloat(usuarioAtual.saldo_redisponivel) + 0.0001;
+      
+      const { error: saldoError } = await supabase
+        .from('usuarios')
+        .update({ saldo_redisponivel: novoSaldo })
+        .eq('id', user.id);
+
+      if (saldoError) throw saldoError;
+
+      // 3. ATUALIZA DADOS DO USUÁRIO LOCALMENTE
+      user.saldo_redisponivel = novoSaldo;
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // 4. MOSTRA CONFIRMAÇÃO
+      alert(`✅ R$ 0,0001 creditado com sucesso!\nSeu saldo agora é: R$ ${novoSaldo.toFixed(4)}`);
+      
+      // 5. REDIRECIONA DE VOLTA PARA LISTA DE ANÚNCIOS
+      setTimeout(() => {
+        window.location.href = 'viewads-botton.html';
+      }, 1500);
+
+    } catch (error) {
+      console.error('Erro ao registrar clique:', error);
+      alert('❌ Erro ao processar crédito. Tente novamente.');
+      
+      // Reabilita botão
+      document.getElementById('confirmBtn').disabled = false;
+      document.getElementById('confirmBtn').innerHTML = '<i class="fas fa-check-circle"></i> RECEBER R$ 0,0001';
+    }
+  }
+
+  function skipAd() {
+    if (confirm('Deseja realmente cancelar este anúncio?\nVocê não receberá o crédito.')) {
+      window.location.href = 'viewads-botton.html';
+    }
+  }
+
+  // Fechar menu ao clicar fora
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menu');
+    const btn = document.querySelector('.menu-btn');
+    if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    }
+  });
+
+  // Pausa timer quando aba não está visível
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      if (timerInterval) clearInterval(timerInterval);
+    } else {
+      if (secondsLeft > 0 && !timerInterval) {
+        startTimer();
+      }
+    }
+  });
+
+  // Carrega biblioteca Supabase
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  document.head.appendChild(script);
+</script>
+
+</body>
+</html>
