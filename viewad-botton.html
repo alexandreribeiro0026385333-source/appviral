@@ -285,10 +285,13 @@
 <nav class="side-menu" id="menu">
   <a href="index.html"><i class="fas fa-home"></i> Home</a>
   <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
   <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
   <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
   <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
 </nav>
 
 <main>
@@ -299,8 +302,8 @@
 
   <div class="user-info-bar">
     <div>
-      Ganho por clique: <strong>R$ 0,0001</strong> | 
-      Saldo atual: <strong id="currentBalance">R$ 0,0000</strong>
+      <strong>Usuário:</strong> <span id="userName">Carregando...</span> | 
+      <strong>Saldo:</strong> <span id="currentBalance">R$ 0,0000</span>
     </div>
     <button class="back-btn" onclick="skipAd()">
       <i class="fas fa-times"></i> Cancelar
@@ -362,11 +365,8 @@
   const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-  // Cliente Supabase
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   // Variáveis globais
-  let duration = 30; // segundos
+  let duration = 30;
   let secondsLeft = duration;
   let timerInterval;
   let anuncioId = null;
@@ -379,31 +379,45 @@
 
   // Inicialização
   window.addEventListener('DOMContentLoaded', async () => {
-    // Verifica login
-    user = JSON.parse(localStorage.getItem('user'));
-    
-    if (!user || !user.id) {
-      window.location.href = 'login-top.html';
-      return;
-    }
-
-    // Atualiza saldo
-    document.getElementById('currentBalance').textContent = 
-      `R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(4)}`;
-
-    // Pega ID do anúncio da URL
-    const params = new URLSearchParams(window.location.search);
-    anuncioId = params.get('id') || 1;
-
-    // Carrega dados do anúncio
-    await loadAdData();
-    
-    // Inicia temporizador
-    startTimer();
+    await carregarPagina();
   });
+
+  async function carregarPagina() {
+    try {
+      // Verifica login
+      user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+      }
+
+      // Mostra nome do usuário e saldo
+      document.getElementById('userName').textContent = user.nome || 'Usuário';
+      document.getElementById('currentBalance').textContent = 
+        `R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(4)}`;
+
+      // Pega ID do anúncio da URL
+      const params = new URLSearchParams(window.location.search);
+      anuncioId = params.get('id') || 1;
+
+      // Carrega dados do anúncio
+      await loadAdData();
+      
+      // Inicia temporizador
+      startTimer();
+
+    } catch (error) {
+      console.error('Erro ao carregar página:', error);
+      alert('Erro ao carregar. Verifique sua conexão.');
+    }
+  }
 
   async function loadAdData() {
     try {
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
       // Busca anúncio no Supabase
       const { data, error } = await supabase
         .from('anuncios')
@@ -499,18 +513,10 @@
       document.getElementById('confirmBtn').disabled = true;
       document.getElementById('confirmBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
 
-      // 1. CHAMA FUNÇÃO PARA INCREMENTAR SALDO NO SUPABASE
-      const { error: saldoError } = await supabase.rpc(
-        'incrementar_saldo',
-        { 
-          user_id: user.id, 
-          valor: 0.0001 
-        }
-      );
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      if (saldoError) throw saldoError;
-
-      // 2. REGISTRA CLIQUE NA TABELA clicks
+      // 1. REGISTRA CLIQUE NA TABELA clicks
       const { data: click, error: clickError } = await supabase
         .from('clicks')
         .insert([
@@ -525,19 +531,28 @@
 
       if (clickError) throw clickError;
 
-      // 3. ATUALIZA DADOS DO USUÁRIO LOCALMENTE
-      const { data: usuarioAtualizado } = await supabase
+      // 2. ATUALIZA SALDO DO USUÁRIO (soma 0.0001)
+      const { data: usuarioAtual } = await supabase
         .from('usuarios')
         .select('saldo_redisponivel')
         .eq('id', user.id)
         .single();
 
-      // Atualiza localStorage
-      user.saldo_redisponivel = usuarioAtualizado.saldo_redisponivel;
+      const novoSaldo = parseFloat(usuarioAtual.saldo_redisponivel) + 0.0001;
+      
+      const { error: saldoError } = await supabase
+        .from('usuarios')
+        .update({ saldo_redisponivel: novoSaldo })
+        .eq('id', user.id);
+
+      if (saldoError) throw saldoError;
+
+      // 3. ATUALIZA DADOS DO USUÁRIO LOCALMENTE
+      user.saldo_redisponivel = novoSaldo;
       localStorage.setItem('user', JSON.stringify(user));
 
       // 4. MOSTRA CONFIRMAÇÃO
-      alert(`✅ R$ 0,0001 creditado com sucesso!\nSeu saldo agora é: R$ ${usuarioAtualizado.saldo_redisponivel.toFixed(4)}`);
+      alert(`✅ R$ 0,0001 creditado com sucesso!\nSeu saldo agora é: R$ ${novoSaldo.toFixed(4)}`);
       
       // 5. REDIRECIONA DE VOLTA PARA LISTA DE ANÚNCIOS
       setTimeout(() => {
@@ -579,10 +594,12 @@
       }
     }
   });
-</script>
 
-<!-- Incluir biblioteca do Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  // Carrega biblioteca Supabase
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  document.head.appendChild(script);
+</script>
 
 </body>
 </html>
