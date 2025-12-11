@@ -214,15 +214,14 @@
 
 <nav class="side-menu" id="menu">
   <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
   <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
   <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-  <a href="#"><i class="fas fa-tachometer-alt"></i> Painel</a>
-  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
-  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
-  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
-  <a href="#"><i class="fas fa-coins"></i> Ações</a>
-  <a href="#"><i class="fas fa-credit-card"></i> Cartão</a>
-  <a href="#"><i class="fas fa-file-invoice-dollar"></i> Extrato</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
 </nav>
 
 <main>
@@ -336,42 +335,39 @@
   const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-  // Cliente Supabase
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
   }
 
-  // Verifica se usuário está logado
-  window.addEventListener('DOMContentLoaded', async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    
-    if (!user || !user.id) {
-      window.location.href = 'login-top.html';
-      return;
-    }
-
-    // Carrega dados do usuário
-    await carregarDadosUsuario(user.id);
-    
-    // Carrega estatísticas de cliques
-    await carregarEstatisticasCliques(user.id);
+  // Carrega tudo quando a página carrega
+  window.addEventListener('DOMContentLoaded', async function() {
+    await carregarDashboard();
   });
 
-  async function carregarDadosUsuario(userId) {
+  async function carregarDashboard() {
     try {
-      // Busca dados do usuário na tabela usuarios
-      const { data: usuario, error } = await supabase
+      // Verifica se usuário está logado
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+      }
+
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      // 1. Busca dados do usuário
+      const { data: usuario, error: userError } = await supabase
         .from('usuarios')
         .select('*')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
-      if (error) throw error;
+      if (userError) throw userError;
 
       if (usuario) {
-        // Atualiza interface
+        // Atualiza interface com dados do usuário
         document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${usuario.nome}!`;
         document.getElementById('saldoTotal').textContent = `R$ ${parseFloat(usuario.saldo_redisponivel || 0).toFixed(4)}`;
         document.getElementById('userId').textContent = usuario.id;
@@ -389,27 +385,20 @@
           document.getElementById('userCadastro').textContent = data.toLocaleDateString('pt-BR');
         }
 
-        // Atualiza localStorage com dados mais recentes
+        // Atualiza localStorage
         localStorage.setItem('user', JSON.stringify({
-          ...JSON.parse(localStorage.getItem('user') || '{}'),
+          ...user,
           ...usuario
         }));
       }
-    } catch (error) {
-      console.error('Erro ao carregar dados do usuário:', error);
-      alert('Erro ao carregar dados. Verifique sua conexão.');
-    }
-  }
 
-  async function carregarEstatisticasCliques(userId) {
-    try {
-      // Busca cliques do usuário
-      const { data: cliques, error } = await supabase
+      // 2. Busca cliques do usuário
+      const { data: cliques, error: clicksError } = await supabase
         .from('clicks')
         .select('*')
-        .eq('usuario_id', userId);
+        .eq('usuario_id', user.id);
 
-      if (error) throw error;
+      if (clicksError) throw clicksError;
 
       // Calcula estatísticas
       const totalClicks = cliques?.length || 0;
@@ -429,21 +418,29 @@
         ultimoClick = new Date(ultimo.created_at).toLocaleString('pt-BR');
       }
 
-      // Média por dia (aprox)
-      const primeiroClique = cliques && cliques.length > 0 ? 
-        new Date(cliques.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0].created_at) : 
-        new Date();
-      const diasDesdePrimeiro = Math.max(1, Math.floor((new Date() - primeiroClique) / (1000 * 60 * 60 * 24)));
-      const mediaDia = Math.round(totalClicks / diasDesdePrimeiro);
+      // Média por dia
+      let mediaDia = 0;
+      if (cliques && cliques.length > 0) {
+        const primeiroClique = new Date(cliques.sort((a, b) => 
+          new Date(a.created_at) - new Date(b.created_at)
+        )[0].created_at);
+        const diasDesdePrimeiro = Math.max(1, Math.floor((new Date() - primeiroClique) / (1000 * 60 * 60 * 24)));
+        mediaDia = Math.round(totalClicks / diasDesdePrimeiro);
+      }
 
-      // Atualiza interface
+      // Atualiza estatísticas
       document.getElementById('totalClicks').textContent = totalClicks;
       document.getElementById('clicksHoje').textContent = clicksHoje;
       document.getElementById('ultimoClick').textContent = ultimoClick;
       document.getElementById('mediaDia').textContent = `${mediaDia}/dia`;
 
+      console.log('✅ Dashboard carregado com sucesso!');
+
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
+      console.error('❌ Erro ao carregar dashboard:', error);
+      document.getElementById('welcomeMessage').textContent = 'Erro ao carregar dados';
+      document.getElementById('saldoTotal').textContent = 'R$ 0,0000';
+      alert('Erro ao carregar dados do dashboard. Verifique sua conexão.');
     }
   }
 
@@ -480,10 +477,12 @@
       menu.classList.remove('open');
     }
   });
-</script>
 
-<!-- Incluir biblioteca do Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  // Carrega biblioteca Supabase
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  document.head.appendChild(script);
+</script>
 
 </body>
 </html>
