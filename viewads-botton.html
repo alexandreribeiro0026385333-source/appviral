@@ -226,12 +226,13 @@
 <nav class="side-menu" id="menu">
   <a href="index.html"><i class="fas fa-home"></i> Home</a>
   <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
   <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
   <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
   <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
-  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
-  <a href="#"><i class="fas fa-coins"></i> Ações</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-code-branch"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-headset"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-money-bill-wave"></i> Sacar</a>
 </nav>
 
 <main>
@@ -242,8 +243,8 @@
 
   <div class="user-info-bar">
     <div>
-      <span id="userName">Carregando...</span>
-      | Saldo: <span id="userBalance">R$ 0,0000</span>
+      <strong>Usuário:</strong> <span id="userName">Carregando...</span>
+      | <strong>Saldo:</strong> <span id="userBalance">R$ 0,0000</span>
     </div>
     <a href="dashboard.html" class="back-btn">
       <i class="fas fa-arrow-left"></i> Voltar ao Painel
@@ -267,38 +268,44 @@
   const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-  // Cliente Supabase
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
   }
 
-  // Carrega ao iniciar
-  window.addEventListener('DOMContentLoaded', async () => {
-    // Verifica se usuário está logado
-    const user = JSON.parse(localStorage.getItem('user'));
-    
-    if (!user || !user.id) {
-      window.location.href = 'login-top.html';
-      return;
-    }
-
-    // Atualiza informações do usuário
-    updateUserInfo(user);
-    
-    // Carrega anúncios
-    await loadAds();
+  // Carrega tudo quando a página carrega
+  window.addEventListener('DOMContentLoaded', async function() {
+    await carregarPagina();
   });
 
-  function updateUserInfo(user) {
-    document.getElementById('userName').textContent = user.nome || 'Usuário';
-    document.getElementById('userBalance').textContent = 
-      `R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(4)}`;
+  async function carregarPagina() {
+    try {
+      // Verifica se usuário está logado
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+      }
+
+      // Mostra nome do usuário logado
+      document.getElementById('userName').textContent = user.nome || 'Usuário';
+      document.getElementById('userBalance').textContent = 
+        `R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(4)}`;
+      
+      // Carrega anúncios
+      await carregarAnuncios();
+
+    } catch (error) {
+      console.error('Erro ao carregar página:', error);
+      alert('Erro ao carregar. Verifique sua conexão.');
+    }
   }
 
-  async function loadAds() {
+  async function carregarAnuncios() {
     try {
+      // Cria cliente Supabase DENTRO da função
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
       // Busca anúncios ativos no Supabase
       const { data: anuncios, error } = await supabase
         .from('anuncios')
@@ -336,7 +343,7 @@
             <div class="ad-desc">${ad.descricao || 'Clique para visualizar este anúncio e ganhar dinheiro.'}</div>
             <div class="ad-footer">
               <div class="ad-time"><i class="fas fa-clock"></i> ${ad.tempo_exibicao || 30} seg</div>
-              <div class="ad-value"><i class="fas fa-coins"></i> R$ 0,0001</div>
+              <div class="ad-value"><i class="fas fa-coins"></i> R$ ${parseFloat(ad.valor_pago || 0.0001).toFixed(4)}</div>
             </div>
           </div>
         </div>
@@ -367,10 +374,12 @@
       menu.classList.remove('open');
     }
   });
-</script>
 
-<!-- Incluir biblioteca do Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  // Carrega biblioteca Supabase
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  document.head.appendChild(script);
+</script>
 
 </body>
 </html>
