@@ -181,14 +181,15 @@
 <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
 
 <nav class="side-menu" id="menu">
-  <a href="#"><i class="fas fa-user-plus"></i> Cadastro</a>
-  <a href="#"><i class="fas fa-tachometer-alt"></i> Painel</a>
-  <a href="#"><i class="fas fa-user-circle"></i> Conta</a>
-  <a href="#"><i class="fas fa-chart-line"></i> CDB</a>
-  <a href="#"><i class="fas fa-coins"></i> Ações</a>
-  <a href="#"><i class="fas fa-credit-card"></i> Cartão</a>
-  <a href="#"><i class="fas fa-file-invoice-dollar"></i> Extrato</a>
   <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Painel</a>
+  <a href="estatisticas.html"><i class="fas fa-chart-bar"></i> Estatísticas</a>
+  <a href="viewads-botton.html"><i class="fas fa-ad"></i> Ver Anúncios</a>
+  <a href="register.html"><i class="fas fa-user-plus"></i> Cadastro</a>
+  <a href="login-top.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <a href="https://ciclone-62mq.onrender.com/"><i class="fas fa-user-circle"></i> CicloneV1</a>
+  <a href="#"><i class="fas fa-chart-line"></i> Suporte24hs</a>
+  <a href="#"><i class="fas fa-coins"></i> Sacar</a>
 </nav>
 
 <main>
@@ -233,14 +234,14 @@
   const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
 
-  // Criar cliente Supabase
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
   }
 
   async function fazerRegistro() {
+    // CRIAR CLIENTE SUPABASE DENTRO DA FUNÇÃO (CORREÇÃO DO ERRO)
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value.trim();
@@ -270,7 +271,7 @@
           {
             nome: nome,
             email: email,
-            senha: senha, // EM PRODUÇÃO: CRIPTOGRAFAR!
+            senha: senha,
             chavepix: chavepix || null,
             telefone: telefone || null,
             avatar: avatar || null,
@@ -309,12 +310,19 @@
     }
   }
 
-  // Fechar menu ao clicar fora (opcional)
+  // Fechar menu ao clicar fora
   document.addEventListener('click', function(event) {
     const menu = document.getElementById('menu');
     const btn = document.querySelector('.menu-btn');
     if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
       menu.classList.remove('open');
+    }
+  });
+
+  // Enter para registrar
+  document.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      fazerRegistro();
     }
   });
 </script>
